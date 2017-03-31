@@ -1,20 +1,20 @@
 {
-    "version"      : "0.1.0",
-    "name"         : "jf-json-api",
-    "author"       : "Joaquín Fernández",
-    "description"  : "Classes for implementing JSON API specification easily.",
-    "keywords"     : [
+    "version": "0.1.1",
+    "name": "jf-json-api",
+    "author": "Joaquín Fernández",
+    "description": "Classes for implementing JSON API specification easily.",
+    "keywords": [
         "api",
         "json",
         "jsonapi"
     ],
-    "license"      : "MIT",
-    "homepage"     : "http://www.joaquinfernandez.net",
-    "repository"   : {
-        "type" : "git",
-        "url"  : "https://github.com/joaquinfq/jfJsonApi"
+    "license": "MIT",
+    "homepage": "http://www.joaquinfernandez.net",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/joaquinfq/jfJsonApi"
     },
-    "dependencies" : {
-        "jf-object" : "^0.1.4"
+    "dependencies": {
+        "jf-object": "^0.1.4"
     }
 }

@@ -62,6 +62,46 @@ module.exports = class Root extends Base {
     }
 
     /**
+     * Add an item to response data.
+     *
+     * @param {String} type     Type of item.
+     * @param {Object} values   Values to add to data section.
+     * @param {String} columnId Key to use as id.
+     */
+    addData(type, values, columnId = 'id')
+    {
+        const _resource = this.__buildResource(type, values, columnId);
+        if (_resource)
+        {
+            let _current = this.data;
+            if (_current.type || _current.id)
+            {
+                this.data = [ _current, _resource ];
+            }
+            else
+            {
+                this.data = _resource;
+            }
+        }
+    }
+
+    /**
+     * Add data to include section.
+     *
+     * @param {String} type     Type of included items.
+     * @param {Object} values   Values to add to include section.
+     * @param {String} columnId Key of values to use as id.
+     */
+    addIncluded(type, values, columnId = 'id')
+    {
+        const _resource = this.__buildResource(type, value, columnId);
+        if (_resource)
+        {
+            this.included.push(_resource);
+        }
+    }
+
+    /**
      * @override
      */
     assign(...config)
@@ -78,6 +118,31 @@ module.exports = class Root extends Base {
             }
         );
         super.assign(...config);
+    }
+
+    /**
+     * Build a resource.
+     *
+     * @param {String} type     Type of included items.
+     * @param {Object} values   Values to add to include section.
+     * @param {String} columnId Key of values to use as id.
+     *
+     * @return {null|jf.JsonApi.Resource} Resource built or null.
+     *
+     * @private
+     */
+    __buildResource(type, values, columnId = 'id')
+    {
+        const _id = values[columnId];
+        return _id
+            ? new Resource(
+                {
+                    id         : _id,
+                    type       : type,
+                    attributes : values
+                }
+            )
+            : null;
     }
 
     /**
@@ -98,7 +163,7 @@ module.exports = class Root extends Base {
             {
                 _items.forEach((config, index) => _items[index] = new Class(config))
             }
-            else if (typeof (_items === 'object'))
+            else if (typeof _items === 'object' && !(_items instanceof Class))
             {
                 config[key] = new Class(_items);
             }
@@ -111,18 +176,33 @@ module.exports = class Root extends Base {
     toJSON()
     {
         const _data = super.toJSON();
-        if (_data.data && _data.errors)
+        if (_data.errors)
         {
             // The members data and errors MUST NOT coexist in the same document.
             delete _data.data;
-        }
-        if (_data.included && !_data.data)
-        {
-            // If a document does not contain a top-level `data` key,
-            // the `included` member MUST NOT be present either.
             delete _data.included;
         }
-
+        else if (!_data.data)
+        {
+            // If current data is an empty collection, set an empty array.
+            if (Array.isArray(this.data))
+            {
+                _data.data = [];
+            }
+            else
+            {
+                if (_data.included)
+                {
+                    // If a document does not contain a top-level `data` key,
+                    // the `included` member MUST NOT be present either.
+                    delete _data.included;
+                }
+                if (!_data.meta)
+                {
+                    _data.data = null;
+                }
+            }
+        }
         return _data;
     }
 
