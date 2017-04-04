@@ -1,5 +1,5 @@
 {
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "jf-json-api",
     "author": "Joaquín Fernández",
     "description": "Classes for implementing JSON API specification easily.",

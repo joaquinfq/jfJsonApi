@@ -74,7 +74,11 @@ module.exports = class Root extends Base {
         if (_resource)
         {
             let _current = this.data;
-            if (_current.type || _current.id)
+            if (Array.isArray(_current))
+            {
+                _current.push(_current);
+            }
+            else if (_current.type || _current.id)
             {
                 this.data = [ _current, _resource ];
             }
@@ -94,7 +98,7 @@ module.exports = class Root extends Base {
      */
     addIncluded(type, values, columnId = 'id')
     {
-        const _resource = this.__buildResource(type, value, columnId);
+        const _resource = this.__buildResource(type, values, columnId);
         if (_resource)
         {
             this.included.push(_resource);
