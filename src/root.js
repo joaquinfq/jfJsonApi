@@ -76,7 +76,7 @@ module.exports = class Root extends Base {
             let _current = this.data;
             if (Array.isArray(_current))
             {
-                _current.push(_current);
+                _current.push(_resource);
             }
             else if (_current.type || _current.id)
             {
