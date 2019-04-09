@@ -59,7 +59,7 @@ module.exports = class Relationship extends jfJsonApiBase
         // A links object containing at least one of the following: self, related
         if (_links && !_links.self && !_links.related)
         {
-            _data.link = null;
+            _data.links = null;
         }
 
         return this.hasValue(_data.meta) || this.hasValue(_data.data) || this.hasValue(_data.links)

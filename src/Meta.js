@@ -15,8 +15,19 @@ module.exports = class Meta extends jfJsonApiBase
     /**
      * @override
      */
-    allowEmptyValues()
+    get allowEmptyValues()
     {
         return true;
+    }
+
+    /**
+     * @override
+     */
+    setProperties(values)
+    {
+        if (this.constructor.isObject(values))
+        {
+            Object.assign(this, values);
+        }
     }
 };

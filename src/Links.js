@@ -16,11 +16,49 @@ module.exports = class jfJsonApiLinks extends jfJsonApiBase
     constructor(config)
     {
         super();
+        /**
+         * The first page of data.
+         *
+         * @property first
+         * @type     {string}
+         */
         this.first   = '';
+        /**
+         * The last page of data.
+         *
+         * @property last
+         * @type     {string}
+         */
         this.last    = '';
+        /**
+         * The next page of data.
+         *
+         * @property next
+         * @type     {string}
+         */
         this.next    = '';
+        /**
+         * The previous page of data.
+         *
+         * @property prev
+         * @type     {string}
+         */
         this.prev    = '';
+        /**
+         * Provides access to resource objects linked in a relationship.
+         * When fetched, the related resource object(s) are returned as
+         * the response’s primary data.
+         *
+         * @property related
+         * @type     {string}
+         */
         this.related = '';
+        /**
+         * Identifies the resource represented by the resource object.
+         *
+         * @property self
+         * @type     {string}
+         */
         this.self    = '';
         //------------------------------------------------------------------------------
         this.setProperties(config);

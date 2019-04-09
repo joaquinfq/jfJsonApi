@@ -23,7 +23,7 @@ const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
  * @class     jf.JsonApi.Resource
  * @extends   jf.JsonApi.ResourceIdentifier
  */
-module.exports = class Resource extends jfJsonApiResourceIdentifier
+module.exports = class jfJsonApiResource extends jfJsonApiResourceIdentifier
 {
     /**
      * @override
@@ -74,8 +74,8 @@ module.exports = class Resource extends jfJsonApiResourceIdentifier
             else
             {
                 // If not, check for properties __ID and __TYPE.
-                _id   = values.__ID;
-                _type = values.__TYPE;
+                _id   = _attributes.__ID;
+                _type = _attributes.__TYPE;
                 if (_id && _type)
                 {
                     // Copy object for deleting properties in copy.
@@ -84,11 +84,15 @@ module.exports = class Resource extends jfJsonApiResourceIdentifier
                     delete _attributes.__TYPE;
                 }
             }
-            if (_type && _id)
+            if (_id && _type)
             {
                 values.attributes = _attributes;
                 values.id         = _attributes[_id] || null;
                 values.type       = _type;
+            }
+            else
+            {
+                delete values.attributes;
             }
         }
         super.setProperties(values);

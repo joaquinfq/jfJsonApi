@@ -58,25 +58,40 @@ module.exports = class jfJsonApiCollectionBase extends jfJsonApiBase
     groupBy(property = 'id')
     {
         const _groups = {};
-        this.items.forEach(
-            item =>
-            {
-                if (property in item)
+        if (property && typeof property === 'string')
+        {
+            this.items.forEach(
+                item =>
                 {
-                    const _value = item[property];
-                    if (_value in _groups)
+                    if (property in item)
                     {
-                        _groups[_value].push(item);
-                    }
-                    else
-                    {
-                        _groups[_value] = [item];
+                        const _value = item[property];
+                        if (_value in _groups)
+                        {
+                            _groups[_value].push(item);
+                        }
+                        else
+                        {
+                            _groups[_value] = [item];
+                        }
                     }
                 }
-            }
-        );
+            );
+        }
 
         return _groups;
+    }
+
+    /**
+     * @NOTE: Called from jf.Object
+     * @override
+     */
+    _parseItems(values)
+    {
+        if (Array.isArray(values))
+        {
+            this.setProperties(values);
+        }
     }
 
     /**

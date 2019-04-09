@@ -8,13 +8,21 @@
         "json",
         "jsonapi"
     ],
-    "license": "MIT",
     "homepage": "http://www.joaquinfernandez.net",
+    "license": "MIT",
+    "main": "src/Root.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/joaquinfq/jfJsonApi"
     },
     "dependencies": {
         "@jf/object": "^3.0.1"
+    },
+    "devDependencies": {
+        "@jf/tests": "^1.1.1",
+        "nyc": "^13.3.0"
+    },
+    "scripts": {
+        "test": "nyc --reporter=text --all --include=src/** jf-tests"
     }
 }

@@ -13,9 +13,18 @@ module.exports = class jfJsonApiBase extends jfObject
      *
      * @return {boolean} `true` if empty values are allowed,
      */
-    allowEmptyValues()
+    get allowEmptyValues()
     {
         return false;
+    }
+
+    /**
+     * @override
+     */
+    constructor(config)
+    {
+        super();
+        this.setProperties(config);
     }
 
     /**
@@ -67,7 +76,7 @@ module.exports = class jfJsonApiBase extends jfObject
         if (typeof _values === 'object' && this.hasValue(_values))
         {
             Object.keys(_values)
-                .filter(key => keys.includes(key))
+                .filter(key => !keys.includes(key))
                 .forEach(key => delete _values[key]);
         }
     }
@@ -105,7 +114,7 @@ module.exports = class jfJsonApiBase extends jfObject
     toJSON()
     {
         const _data = super.toJSON();
-        if (!this.allowEmptyValues())
+        if (!this.allowEmptyValues)
         {
             Object.keys(_data)
                 .filter(key => !this.hasValue(_data[key]))

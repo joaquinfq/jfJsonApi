@@ -154,7 +154,6 @@ module.exports = class Root extends jfJsonApiBase
         const _appData = _app.data;
         if (_data instanceof jfJsonApiResource)
         {
-            _data       = _data.toJSON();
             const _type = _data.type;
             if (_type in _appData)
             {
@@ -169,6 +168,8 @@ module.exports = class Root extends jfJsonApiBase
         {
             Object.assign(_appData, _data.groupBy('type'));
         }
+        Object.keys(_appData)
+            .forEach(type => _appData[type] = _appData[type].map(item => item.toJSON().attributes));
 
         return _app;
     }

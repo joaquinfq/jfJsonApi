@@ -1,4 +1,5 @@
 const jfJsonApiBase = require('./Base');
+const jfJsonApiMeta = require('./Meta');
 /**
  * Each member of a links object is a `link`. A link MUST be represented as either:
  *
@@ -30,7 +31,7 @@ module.exports = class jfJsonApiLink extends jfJsonApiBase
          *
          * @type {Object}
          */
-        this.meta = {};
+        this.meta = new jfJsonApiMeta();
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
@@ -40,10 +41,15 @@ module.exports = class jfJsonApiLink extends jfJsonApiBase
      */
     toJSON()
     {
-        return this.hasValue(this.meta)
-            ? super.toJSON()
-            : this.hasValue(this.href)
-                ? this.href
-                : undefined;
+        let _data;
+        const _hasHref = this.hasValue(this.href);
+        if (_hasHref)
+        {
+            _data = this.hasValue(this.meta)
+                ? super.toJSON()
+                : this.href;
+        }
+
+        return _data;
     }
 };

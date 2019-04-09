@@ -8,7 +8,7 @@ const jfJsonApiMeta = require('./Meta');
  * @class     jf.JsonApi.JsonApi
  * @extends   jf.JsonApi.Base
  */
-module.exports = class jfJsonApi extends jfJsonApiBase
+module.exports = class jfJsonApiJsonApi extends jfJsonApiBase
 {
     /**
      * @override
