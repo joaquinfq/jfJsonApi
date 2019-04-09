@@ -1,7 +1,7 @@
-const Base               = require('./base');
-const ResourceIdentifier = require('./resource-identifier');
-const Links              = require('./links');
-const Meta               = require('./meta');
+const jfJsonApiBase               = require('./Base');
+const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
+const jfJsonApiLinks              = require('./Links');
+const jfJsonApiMeta               = require('./Meta');
 /**
  * Represent references from the resource object in which it’s defined to
  * other resource objects.
@@ -10,7 +10,8 @@ const Meta               = require('./meta');
  * @class     jf.JsonApi.Relationship
  * @extends   jf.JsonApi.Base
  */
-module.exports = class Relationship extends Base {
+module.exports = class Relationship extends jfJsonApiBase
+{
     /**
      * @override
      */
@@ -23,7 +24,7 @@ module.exports = class Relationship extends Base {
          *
          * @type {jf.JsonApi.ResourceIdentifier}
          */
-        this.data = new ResourceIdentifier();
+        this.data = new jfJsonApiResourceIdentifier();
         /**
          * A links object containing at least one of the following:
          * - self:    A link for the relationship itself (a `relationship link`).
@@ -37,15 +38,15 @@ module.exports = class Relationship extends Base {
          *
          * @type {jf.JsonApi.Links}
          */
-        this.links = new Links();
+        this.links = new jfJsonApiLinks();
         /**
          * Meta object containing non-standard meta-information about the relationship.
          *
          * @type {jf.JsonApi.Meta}
          */
-        this.meta = new Meta();
+        this.meta = new jfJsonApiMeta();
         //---------------------------------------------------------------------
-        this.assign(config);
+        this.setProperties(config);
     }
 
     /**
@@ -60,6 +61,7 @@ module.exports = class Relationship extends Base {
         {
             _data.link = null;
         }
+
         return this.hasValue(_data.meta) || this.hasValue(_data.data) || this.hasValue(_data.links)
             ? _data
             : undefined;

@@ -1,4 +1,4 @@
-const Base = require('./base');
+const jfJsonApiBase = require('./Base');
 /**
  * Each member of a links object is a `link`. A link MUST be represented as either:
  *
@@ -11,7 +11,8 @@ const Base = require('./base');
  * @class     jf.JsonApi.Link
  * @extends   jf.JsonApi.Base
  */
-module.exports = class Link extends Base {
+module.exports = class jfJsonApiLink extends jfJsonApiBase
+{
     /**
      * @override
      */
@@ -31,7 +32,7 @@ module.exports = class Link extends Base {
          */
         this.meta = {};
         //---------------------------------------------------------------------
-        this.assign(config);
+        this.setProperties(config);
     }
 
     /**

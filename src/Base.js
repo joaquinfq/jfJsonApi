@@ -1,4 +1,4 @@
-const jfObject = require('jf-object');
+const jfObject = require('@jf/object');
 /**
  * Base class for all classes in application.
  *
@@ -6,9 +6,12 @@ const jfObject = require('jf-object');
  * @class     jf.JsonApi.Base
  * @extends   jf.Object
  */
-module.exports = class Base extends jfObject {
+module.exports = class jfJsonApiBase extends jfObject
+{
     /**
      * Indicates if empty values are allowed in result.
+     *
+     * @return {boolean} `true` if empty values are allowed,
      */
     allowEmptyValues()
     {
@@ -21,7 +24,7 @@ module.exports = class Base extends jfObject {
      *
      * @param {*} value Value to check.
      *
-     * @return {Boolean} `true` is value is present.
+     * @return {boolean} `true` is value is present.
      */
     hasValue(value)
     {
@@ -48,29 +51,51 @@ module.exports = class Base extends jfObject {
                     break;
             }
         }
+
         return _hasValue;
     }
 
     /**
-     * Remove keys from property not in `keys` parameter.
+     * Keep only keys in `keys` parameter.
      *
-     * @param {String}   property Property to check.
-     * @param {String[]} keys     Keys to keep.
+     * @param {string}   property Property to check.
+     * @param {string[]} keys     Keys to keep.
      */
     keepKeys(property, keys)
     {
         const _values = this[property];
         if (typeof _values === 'object' && this.hasValue(_values))
         {
-            Object.keys(_values).forEach(
+            Object.keys(_values)
+                .filter(key => keys.includes(key))
+                .forEach(key => delete _values[key]);
+        }
+    }
+
+    /**
+     * @override
+     */
+    setProperties(values)
+    {
+        if (values && typeof values === 'object')
+        {
+            const _values = {};
+            Object.keys(values).forEach(
                 key =>
                 {
-                    if (keys.indexOf(key) === -1)
+                    const _current = this[key];
+                    const _value   = values[key];
+                    if (_current instanceof jfJsonApiBase)
                     {
-                        delete _values[key];
+                        this[key] = new _current.constructor(_value);
+                    }
+                    else
+                    {
+                        _values[key] = _value;
                     }
                 }
-            )
+            );
+            super.setProperties(_values);
         }
     }
 
@@ -80,15 +105,13 @@ module.exports = class Base extends jfObject {
     toJSON()
     {
         const _data = super.toJSON();
-        Object.keys(_data).forEach(
-            key =>
-            {
-                if (!this.allowEmptyValues() && !this.hasValue(_data[key]))
-                {
-                    delete _data[key];
-                }
-            }
-        );
+        if (!this.allowEmptyValues())
+        {
+            Object.keys(_data)
+                .filter(key => !this.hasValue(_data[key]))
+                .forEach(key => delete _data[key]);
+        }
+
         return _data;
     }
 };

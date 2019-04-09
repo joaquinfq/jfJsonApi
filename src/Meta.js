@@ -1,4 +1,4 @@
-const Base = require('./base');
+const jfJsonApiBase = require('./Base');
 /**
  * Where specified, a meta member can be used to include non-standard meta-information.
  *
@@ -10,7 +10,8 @@ const Base = require('./base');
  * @class     jf.JsonApi.Meta
  * @extends   jf.JsonApi.Base
  */
-module.exports = class Meta extends Base {
+module.exports = class Meta extends jfJsonApiBase
+{
     /**
      * @override
      */

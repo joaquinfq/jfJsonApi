@@ -1,5 +1,5 @@
-const Base = require('./base');
-const Meta = require('./meta');
+const jfJsonApiBase = require('./Base');
+const jfJsonApiMeta = require('./Meta');
 /**
  * A JSON API document MAY include information about its implementation
  * under a top level `jsonapi` member.
@@ -8,7 +8,8 @@ const Meta = require('./meta');
  * @class     jf.JsonApi.JsonApi
  * @extends   jf.JsonApi.Base
  */
-module.exports = class JsonApi extends Base {
+module.exports = class jfJsonApi extends jfJsonApiBase
+{
     /**
      * @override
      */
@@ -20,7 +21,7 @@ module.exports = class JsonApi extends Base {
          *
          * @type {jf.JsonApi.Meta}
          */
-        this.meta = new Meta();
+        this.meta = new jfJsonApiMeta();
         /**
          * This value is a string indicating the highest JSON API
          * version supported.
@@ -29,6 +30,6 @@ module.exports = class JsonApi extends Base {
          */
         this.version = '1.0';
         //------------------------------------------------------------------------------
-        this.assign(config);
+        this.setProperties(config);
     }
 };

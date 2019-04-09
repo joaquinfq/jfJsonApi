@@ -1,4 +1,4 @@
-const Base = require('./base');
+const jfJsonApiBase = require('./Base');
 /**
  * A server MAY choose to stop processing as soon as a problem is encountered, or
  * it MAY continue processing and encounter multiple problems.
@@ -14,7 +14,8 @@ const Base = require('./base');
  * @class     jf.JsonApi.Error
  * @extends   jf.JsonApi.Base
  */
-module.exports = class Error extends Base {
+module.exports = class jfJsonApiError extends jfJsonApiBase
+{
     /**
      * @override
      */
@@ -80,7 +81,7 @@ module.exports = class Error extends Base {
          */
         this.status = '';
         //------------------------------------------------------------------------------
-        this.assign(config);
+        this.setProperties(config);
     }
 
     /**
@@ -90,6 +91,7 @@ module.exports = class Error extends Base {
     {
         this.keepKeys('links', ['about']);
         this.keepKeys('source', ['parameter', 'pointer']);
+
         return super.toJSON();
     }
 };

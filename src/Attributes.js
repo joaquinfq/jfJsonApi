@@ -1,4 +1,4 @@
-const Base = require('./base');
+const Base = require('./Base');
 /**
  * The value of the attributes key MUST be an object (an `attributes object`).
  * Members of the attributes object (`attributes`) represent information about the resource object in which it’s defined.
@@ -16,12 +16,21 @@ const Base = require('./base');
  * @class     jf.JsonApi.Attributes
  * @extends   jf.JsonApi.Base
  */
-module.exports = class Attributes extends Base {
+module.exports = class jfJsonApiAttributes extends Base
+{
     /**
      * @override
      */
     allowEmptyValues()
     {
         return true;
+    }
+
+    setProperties(values)
+    {
+        if (values && typeof values === 'object')
+        {
+            Object.assign(this, values);
+        }
     }
 };
