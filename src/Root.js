@@ -218,6 +218,8 @@ module.exports = class Root extends jfJsonApiBase
      */
     toServer()
     {
-        return this.toJSON();
+        return {
+            data : this.toJSON().data
+        };
     }
 };

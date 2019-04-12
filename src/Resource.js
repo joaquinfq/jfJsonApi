@@ -55,45 +55,56 @@ module.exports = class jfJsonApiResource extends jfJsonApiResourceIdentifier
     }
 
     /**
+     * Check if `item` is an instance of jf.dataType.Item looking for
+     * properties returning strings instead of add this module as dependency.
+     *
+     * If not is a jf.dataType item, then check if item has __ID && __TYPE properties.
+     *
+     * @param {object} item Item to check.
+     *
+     * @return {object}
+     *
+     * @private
+     */
+    __checkAttributes(item)
+    {
+        let _attributes;
+        let _id   = item.constructor.ID;
+        let _type = item.constructor.TYPE;
+        if (_id && _type)
+        {
+            _attributes = item.toJSON();
+            _id         = _attributes[_id];
+        }
+        else
+        {
+            // If not, check for properties __ID and __TYPE.
+            _id   = item.__ID;
+            _type = item.__TYPE;
+            if (_id && _type)
+            {
+                // Copy object for deleting properties in copy.
+                _attributes = { ...item };
+                delete _attributes.__ID;
+                delete _attributes.__TYPE;
+            }
+        }
+        return {
+            id         : _id,
+            type       : _type,
+            attributes : _attributes
+        };
+    }
+
+    /**
      * @override
      */
     setProperties(values)
     {
         const _isObject = this.constructor.isObject;
-        if (_isObject(values) && _isObject(values.attributes))
+        if (_isObject(values) && !_isObject(values.attributes))
         {
-            let _attributes = values.attributes;
-            // Check if `values` is an instance of jf.dataType.Item looking for
-            // properties returning strings instead of add this module as dependency.
-            let _id   = _attributes.constructor.ID;
-            let _type = _attributes.constructor.TYPE;
-            if (_id && _type)
-            {
-                _attributes = _attributes.toJSON();
-            }
-            else
-            {
-                // If not, check for properties __ID and __TYPE.
-                _id   = _attributes.__ID;
-                _type = _attributes.__TYPE;
-                if (_id && _type)
-                {
-                    // Copy object for deleting properties in copy.
-                    _attributes = { ..._attributes };
-                    delete _attributes.__ID;
-                    delete _attributes.__TYPE;
-                }
-            }
-            if (_id && _type)
-            {
-                values.attributes = _attributes;
-                values.id         = _attributes[_id] || null;
-                values.type       = _type;
-            }
-            else
-            {
-                delete values.attributes;
-            }
+            values = this.__checkAttributes(values);
         }
         super.setProperties(values);
     }
