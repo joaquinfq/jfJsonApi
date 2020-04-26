@@ -1,0 +1,266 @@
+package: jf.JsonApi
+description: Classes for implementing JSON API specification easily.
+version: 1.0.0
+collections:
+    Base:
+        basename: jf.dataType.Collection
+        methods:
+            toJSON:
+                override: '@override'
+                body: |
+                    const _data = super.toJSON();
+
+                    return this.hasValue(_data)
+                        ? _data
+                        : undefined;
+
+    Errors:
+        description: List of errors found.
+        item: Error
+
+    Relationships:
+        description: List of relationships.
+        item: Relationship
+
+
+    Resources:
+        description: List of resources.
+        item: Resource
+
+types:
+    Base:
+        basename: jf.dataType.Item
+        const:
+            allowEmptyValues:
+                description: Indicates if empty values are allowed in result
+                type: boolean
+                value: false
+        methods:
+            hasValue:
+                description: |
+                    Check if `value` has a right value.
+                params:
+                    value: Value to check (*)
+                return:
+                    description: "`true` is value is present."
+                    type: boolean
+                body: |
+                    let _hasValue = value !== null && value !== undefined;
+                    if (_hasValue)
+                    {
+                        switch (typeof value)
+                        {
+                            case 'function':
+                                _hasValue = false;
+                                break;
+                            case 'string':
+                                _hasValue = value !== '';
+                                break;
+                            case 'object':
+                                if (Array.isArray(value))
+                                {
+                                    _hasValue = value.length > 0;
+                                }
+                                else
+                                {
+                                    _hasValue = Object.keys(value).length > 0;
+                                }
+                                break;
+                        }
+                    }
+
+                    return _hasValue;
+            toJSON:
+                override: true
+                body: |
+                    const _data = super.toJSON();
+                    if (!this.constructor.allowEmptyValues)
+                    {
+                        Object.keys(_data)
+                            .filter(key => !this.hasValue(_data[key]))
+                            .forEach(key => delete _data[key]);
+                    }
+
+                    return _data;
+
+    Attributes:
+        basename: Meta
+        description: |
+            The value of the attributes key MUST be an object (an `attributes object`).
+            Members of the attributes object (`attributes`) represent information about the resource object in which it's defined.
+
+            Attributes may contain any valid JSON value.
+
+            Complex data structures involving JSON objects and arrays are allowed as attribute values.
+            However, any object that constitutes or is contained in an attribute MUST NOT contain a
+            `relationships` or `links` member, as those members are reserved by this specification for future use.
+
+            Although has-one foreign keys (e.g. author_id) are often stored internally alongside other
+            information to be represented in a resource object, these keys SHOULD NOT appear as attributes.
+
+    Error:
+        description: |
+            A server MAY choose to stop processing as soon as a problem is encountered, or
+            it MAY continue processing and encounter multiple problems.
+            For instance, a server might process multiple attributes and then return
+            multiple validation problems in a single response.
+
+            When a server encounters multiple problems for a single request, the most
+            generally applicable HTTP error code SHOULD be used in the response.
+            For instance, 400 Bad Request might be appropriate for multiple 4xx errors
+            or 500 Internal Server Error might be appropriate for multiple 5xx errors.
+        properties:
+            code: An application-specific error code, expressed as a string value.
+            detail: |
+                A human-readable explanation specific to this occurrence of the problem.
+                Like `title`, this field's value can be localized.
+            id: Unique identifier for this particular occurrence of the problem.
+            links: A links object containing error references (ErrorLink).
+            meta: A meta object containing non-standard meta-information about the error (*)
+            title: |
+                A short, human-readable summary of the problem that SHOULD NOT change from
+                occurrence to occurrence of the problem, except for purposes of localization.
+            source: An object containing references to the source of the error (ErrorSource).
+            status: The HTTP status code applicable to this problem, expressed as a string value.
+
+    ErrorLink:
+        description: A links object containing error references.
+        properties:
+            about: A link that leads to further details about this particular occurrence of the problem.
+
+    ErrorSource:
+        description: An object containing references to the source of the error.
+        properties:
+            parameter: A string indicating which URI query parameter caused the error.
+            pointer: |
+                A JSON Pointer (RFC6901) to the associated entity in the request
+                document [e.g. "/data" for a primary data object, or
+                "/data/attributes/title" for a specific attribute].
+
+    JsonApi:
+        description: |
+            A JSON API document MAY include information about its implementation
+            under a top level `jsonapi` member.
+        properties:
+            meta: This value is a meta object that contains non-standard meta-information (Meta).
+            version:  This value is a string indicating the highest JSON API version supported (value:1.0).
+
+    Link:
+        description: |
+            Each member of a links object is a `link`. A link MUST be represented as either:
+
+            - A string containing the link's URL.
+            - An object (`link object`) which can contain the following members:
+              - href: A string containing the link's URL.
+              - meta: A meta object containing non-standard meta-information about the link.
+        properties:
+            href: String containing the link's URL.
+            meta: Meta object containing non-standard meta-information about the link (Meta).
+
+    Links:
+        description: |
+            Where specified, a links member can be used to represent links.
+            The value of each `links` member MUST be an object (a `link object`).
+
+            A links object containing at least one of the following:
+            - self:    A link for the relationship itself (a `relationship link`).
+                       This link allows the client to directly manipulate the relationship.
+                       For example, removing an author through an article's relationship
+                       URL would disconnect the person from the article without deleting
+                       the people resource itself.
+                       When fetched successfully, this link returns the linkage for the
+                       related resources as its primary data.
+            - related: A related resource link.
+        properties:
+            first: The first page of data.
+            last: The last page of data.
+            next: The next page of data.
+            prev: The previous page of data.
+            related: |
+                Provides access to resource objects linked in a relationship.
+                When fetched, the related resource object(s) are returned as
+                the response's primary data.
+            self: Identifies the resource represented by the resource object.
+
+    Meta:
+        description: |
+            Where specified, a meta member can be used to include non-standard meta-information.
+
+            The value of each meta member MUST be an object (a `meta object`).
+
+            Any members MAY be specified within meta objects.
+
+    Relationship:
+        description: |
+            Represent references from the resource object in which it's defined to
+            other resource objects.
+        properties:
+            data:
+                description: |
+                    Allows a client to link together all of the included
+                    resource objects without having to GET any URLs via links.
+                type: ResourceIdentifier
+            links: A links object containing with information about relationship (Links).
+            meta: Meta object containing non-standard meta-information about the relationship (Meta)
+
+    Resource:
+        basename: ResourceIdentifier
+        description: |
+            The document's `primary data` is a representation of the resource
+            or collection of resources targeted by a request.
+
+            Every resource object MUST contain an id member and a type member.
+            The values of the id and type members MUST be strings.
+
+            Within a given API, each resource object's type and id pair MUST
+            identify a single, unique resource. (The set of URIs controlled by a
+            server, or multiple servers acting as one, constitute an API.)
+
+            The type member is used to describe resource objects that share
+            common attributes and relationships.
+
+            The values of type members MUST adhere to the same constraints as member names.
+        properties:
+            attributes: An attributes object representing some of the resource's data (Attributes).
+            links: Links of resource (Links).
+            relationships:
+                description: |
+                    A relationships object describing relationships between
+                    the resource and other JSON API resources.
+                type: Relationships
+
+    ResourceIdentifier:
+        description: A `resource identifier object` is an object that identifies an individual resource.
+        properties:
+            id: |
+                Resource identifier.
+
+                The id member is not required when the resource object originates
+                at the client and represents a new resource to be created on the server. (required:true)
+            meta:
+                description: |
+                    A meta object containing non-standard meta-information about
+                    a resource that can not be represented as an attribute or relationship.
+
+                    A `resource identifier object` MAY also include a meta member, whose
+                    value is a meta object that contains non-standard meta-information.
+                type: Meta
+            type: The type member is used to describe resource objects that share common attributes and relationships.
+
+    Root:
+        description: |
+            A JSON object MUST be at the root of every JSON API request and
+            response containing data.
+
+            This object defines a document's `top level`.
+        const:
+            CONTENT_TYPE:
+                description: Returns `Content-Type` header to use with JSON API
+                value: application/vnd.api+json
+        properties:
+            data: The document's primary data (Resource)
+            errors: Array of error objects (Errors)
+            included: An array of resource objects that are related to the primary data and/or each other (Resources)
+            links: An object describing the server's implementation (Links)
+            jsonapi: An object describing the server's implementation (JsonApi)
+            meta: The document's metadata (Meta)
