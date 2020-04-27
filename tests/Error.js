@@ -1,5 +1,7 @@
-const jfJsonApiError    = require('../src/Error');
-const jfJsonApiTestBase = require('./_Base');
+const jfJsonApiError       = require('../src/Error');
+const jfJsonApiErrorLink   = require('../src/ErrorLink');
+const jfJsonApiErrorSource = require('../src/ErrorSource');
+const jfJsonApiTestBase    = require('./_Base');
 /**
  * Pruebas unitarias de la clase `jf.JsonApi.Error`.
  */
@@ -29,10 +31,10 @@ module.exports = class jfJsonApiErrorTest extends jfJsonApiTestBase
             code             : '',
             detail           : '',
             id               : '',
-            links            : {},
+            links            : new jfJsonApiErrorLink(),
             meta             : {},
             title            : '',
-            source           : {},
+            source           : new jfJsonApiErrorSource(),
             status           : ''
         };
     }

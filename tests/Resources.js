@@ -48,11 +48,7 @@ module.exports = class jfJsonApiResourcesTest extends jfTestsUnit
             id   : Math.random(),
             type : Math.random()
         };
-        const _sut  = new jfJsonApiResources(
-            [
-                _item
-            ]
-        );
+        const _sut  = new jfJsonApiResources([ _item ]);
         this.assertTrue(_sut.items[0] instanceof jfJsonApiResource);
         this._assert('', _sut.toJSON(), [ _item ]);
     }

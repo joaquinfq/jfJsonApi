@@ -1,18 +1,19 @@
 const jfJsonApiBase = require('./Base');
 const jfJsonApiMeta = require('./Meta');
+
 /**
  * Each member of a links object is a `link`. A link MUST be represented as either:
  *
- * - A string containing the link’s URL.
+ * - A string containing the link's URL.
  * - An object (`link object`) which can contain the following members:
- *   - href: A string containing the link’s URL.
+ *   - href: A string containing the link's URL.
  *   - meta: A meta object containing non-standard meta-information about the link.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Link
  * @extends   jf.JsonApi.Base
  */
-module.exports = class jfJsonApiLink extends jfJsonApiBase
+class jfJsonApiLink extends jfJsonApiBase
 {
     /**
      * @override
@@ -21,15 +22,17 @@ module.exports = class jfJsonApiLink extends jfJsonApiBase
     {
         super();
         /**
-         * String containing the link's URL
+         * String containing the link's URL.
          *
-         * @type {String}
+         * @property href
+         * @type     {string}
          */
         this.href = '';
         /**
          * Meta object containing non-standard meta-information about the link.
          *
-         * @type {Object}
+         * @property meta
+         * @type     {jf.JsonApi.Meta}
          */
         this.meta = new jfJsonApiMeta();
         //---------------------------------------------------------------------
@@ -52,4 +55,6 @@ module.exports = class jfJsonApiLink extends jfJsonApiBase
 
         return _data;
     }
-};
+}
+
+module.exports = jfJsonApiLink;

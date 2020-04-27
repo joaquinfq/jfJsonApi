@@ -1,14 +1,26 @@
 const jfJsonApiBase = require('./Base');
 const jfJsonApiLink = require('./Link');
+
 /**
  * Where specified, a links member can be used to represent links.
+ *
  * The value of each `links` member MUST be an object (a `link object`).
+ *
+ * A links object containing at least one of the following:
+ *
+ * - related: A related resource link.
+ * - self:    A link for the relationship itself (a `relationship link`).
+ *            This link allows the client to directly manipulate the relationship.
+ *            For example, removing an author through an article's relationship URL would disconnect
+ *            the person from the article without deleting the people resource itself.
+ *            When fetched successfully, this link returns the linkage for the related resources as
+ *            its primary data.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Links
- * @extends   jf.JsonApi.CollectionBase
+ * @extends   jf.JsonApi.Base
  */
-module.exports = class jfJsonApiLinks extends jfJsonApiBase
+class jfJsonApiLinks extends jfJsonApiBase
 {
     /**
      * @override
@@ -17,37 +29,37 @@ module.exports = class jfJsonApiLinks extends jfJsonApiBase
     {
         super();
         /**
-         * The first page of data.
+         * The first page of data (only in pagination links of a collection).
          *
          * @property first
          * @type     {string}
          */
-        this.first   = '';
+        this.first = '';
         /**
-         * The last page of data.
+         * The last page of data (only in pagination links of a collection).
          *
          * @property last
          * @type     {string}
          */
-        this.last    = '';
+        this.last = '';
         /**
-         * The next page of data.
+         * The next page of data (only in pagination links of a collection).
          *
          * @property next
          * @type     {string}
          */
-        this.next    = '';
+        this.next = '';
         /**
-         * The previous page of data.
+         * The previous page of data (only in pagination links of a collection).
          *
          * @property prev
          * @type     {string}
          */
-        this.prev    = '';
+        this.prev = '';
         /**
          * Provides access to resource objects linked in a relationship.
          * When fetched, the related resource object(s) are returned as
-         * the response’s primary data.
+         * the response's primary data.
          *
          * @property related
          * @type     {string}
@@ -59,8 +71,8 @@ module.exports = class jfJsonApiLinks extends jfJsonApiBase
          * @property self
          * @type     {string}
          */
-        this.self    = '';
-        //------------------------------------------------------------------------------
+        this.self = '';
+        //---------------------------------------------------------------------
         this.setProperties(config);
     }
 
@@ -85,4 +97,6 @@ module.exports = class jfJsonApiLinks extends jfJsonApiBase
             super.setProperties(_values);
         }
     }
-};
+}
+
+module.exports = jfJsonApiLinks;

@@ -49,13 +49,16 @@ module.exports = class jfJsonApiCollectionBaseTest extends jfTestsUnit
     {
         this._testDefinition(
             jfJsonApiCollectionBase,
-            {
-                ITEM : null
-            },
+            null,
             {
                 allowEmptyValues : false,
                 items            : []
             }
+        );
+        this.assertException(
+            () => jfJsonApiCollectionBase.ITEM,
+            Error,
+            'Abstract property'
         );
     }
 

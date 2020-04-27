@@ -1,29 +1,29 @@
 const jfJsonApiBase      = require('./Base');
 const jfJsonApiErrors    = require('./Errors');
-const jfJsonApiLinks     = require('./Links');
 const jfJsonApiJsonApi   = require('./JsonApi');
+const jfJsonApiLinks     = require('./Links');
 const jfJsonApiMeta      = require('./Meta');
 const jfJsonApiResource  = require('./Resource');
 const jfJsonApiResources = require('./Resources');
+
 /**
- * A JSON object MUST be at the root of every JSON API request and
- * response containing data.
+ * A JSON object MUST be at the root of every JSON API request and response containing data.
  *
- * This object defines a document’s `top level`.
+ * This object defines a document's `top level`.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Root
  * @extends   jf.JsonApi.Base
  */
-module.exports = class Root extends jfJsonApiBase
+class jfJsonApiRoot extends jfJsonApiBase
 {
     /**
      * Returns `Content-Type` header to use with JSON API.
      *
-     * @property ContentType
+     * @property CONTENT_TYPE
      * @type     {string}
      */
-    static get ContentType()
+    static get CONTENT_TYPE()
     {
         return 'application/vnd.api+json';
     }
@@ -35,42 +35,48 @@ module.exports = class Root extends jfJsonApiBase
     {
         super();
         /**
-         * The document’s primary data
+         * The document's primary data.
          *
-         * @type {jf.JsonApi.Resource}
+         * @property data
+         * @type     {jf.JsonApi.Resource}
          */
-        this.data = null;
+        this.data = new jfJsonApiResource();
         /**
          * Array of error objects.
          *
-         * @type {jf.JsonApi.Error[]}
+         * @property errors
+         * @type     {jf.JsonApi.Errors}
          */
         this.errors = new jfJsonApiErrors();
         /**
          * An array of resource objects that are related to the primary data and/or each other.
          *
-         * @type {jf.JsonApi.Resource[]}
+         * @property included
+         * @type     {jf.JsonApi.Resources}
          */
         this.included = new jfJsonApiResources();
         /**
-         * An object describing the server’s implementation.
+         * An object describing the server's implementation.
          *
-         * @type {jf.JsonApi.Links}
-         */
-        this.links = new jfJsonApiLinks();
-        /**
-         * An object describing the server’s implementation.
-         *
-         * @type {jf.JsonApi.JsonApi}
+         * @property jsonapi
+         * @type     {jf.JsonApi.JsonApi}
          */
         this.jsonapi = new jfJsonApiJsonApi();
         /**
+         * An object describing the server's implementation.
+         *
+         * @property links
+         * @type     {jf.JsonApi.Links}
+         */
+        this.links = new jfJsonApiLinks();
+        /**
          * The document's metadata.
          *
-         * @type {jf.JsonApi.Meta}
+         * @property meta
+         * @type     {jf.JsonApi.Meta}
          */
         this.meta = new jfJsonApiMeta();
-        //------------------------------------------------------------------------------
+        //---------------------------------------------------------------------
         this.setProperties(config);
     }
 
@@ -95,10 +101,11 @@ module.exports = class Root extends jfJsonApiBase
     /**
      * Add data to include section.
      *
+     * @NOTE  Called from `jf.Object`.
+     *
      * @param {object} item Item to add to include section.
      *
      * @protected
-     * @NOTE: Called from jf.Object.
      */
     _parseData(item)
     {
@@ -122,10 +129,11 @@ module.exports = class Root extends jfJsonApiBase
     /**
      * Parse items and add them to include section.
      *
+     * @NOTE  Called from `jf.Object`.
+     *
      * @param {array|object} items Items to add to include section.
      *
      * @protected
-     * @NOTE: Called from jf.Object.
      */
     _parseIncluded(items)
     {
@@ -150,8 +158,8 @@ module.exports = class Root extends jfJsonApiBase
             data   : this.included.groupBy('type'),
             errors : this.errors.groupBy('code')
         };
-        let _data      = this.data;
         const _appData = _app.data;
+        const _data    = this.data;
         if (_data instanceof jfJsonApiResource)
         {
             const _type = _data.type;
@@ -222,4 +230,6 @@ module.exports = class Root extends jfJsonApiBase
             data : this.toJSON().data
         };
     }
-};
+}
+
+module.exports = jfJsonApiRoot;

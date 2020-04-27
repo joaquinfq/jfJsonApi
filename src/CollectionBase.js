@@ -1,22 +1,23 @@
 const jfJsonApiBase = require('./Base');
+
 /**
  * Base class for collections.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.CollectionBase
- * @extends   jf.JsonApi.Base
+ * @extends   jf.dataType.Collection
  */
-module.exports = class jfJsonApiCollectionBase extends jfJsonApiBase
+class jfJsonApiCollectionBase extends jfJsonApiBase
 {
     /**
      * Class of each item in collection.
      *
      * @property ITEM
-     * @type     {null|Function}
+     * @type     {jf.JsonApi.Base}
      */
     static get ITEM()
     {
-        return null;
+        throw new Error('Abstract property');
     }
 
     /**
@@ -28,10 +29,11 @@ module.exports = class jfJsonApiCollectionBase extends jfJsonApiBase
         /**
          * Collection items.
          *
-         * @type {jf.JsonApi.Base}
+         * @property items
+         * @type     {jf.JsonApi.Base[]}
          */
         this.items = [];
-        //------------------------------------------------------------------------------
+        //---------------------------------------------------------------------
         this.setProperties(config);
     }
 
@@ -83,8 +85,9 @@ module.exports = class jfJsonApiCollectionBase extends jfJsonApiBase
     }
 
     /**
-     * @NOTE: Called from jf.Object
      * @override
+     *
+     * @NOTE Called from `jf.Object`.
      */
     _parseItems(values)
     {
@@ -116,9 +119,12 @@ module.exports = class jfJsonApiCollectionBase extends jfJsonApiBase
      */
     toJSON()
     {
-        const _value = this.constructor.serialize(this.items);
-        return this.hasValue(_value)
-            ? _value
+        const _data = super.toJSON();
+
+        return this.hasValue(_data.items)
+            ? _data.items
             : undefined;
     }
-};
+}
+
+module.exports = jfJsonApiCollectionBase;

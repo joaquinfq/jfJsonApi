@@ -30,7 +30,7 @@ module.exports = class jfJsonApiRootTest extends jfTestsUnit
             null,
             {
                 allowEmptyValues : false,
-                data             : null,
+                data             : new jfJsonApiResource(),
                 errors           : new jfJsonApiErrors(),
                 included         : new jfJsonApiResources(),
                 links            : new jfJsonApiLinks(),

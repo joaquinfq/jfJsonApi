@@ -1,13 +1,14 @@
 const jfJsonApiCollectionBase = require('./CollectionBase');
 const jfJsonApiResource       = require('./Resource');
+
 /**
- * List of resources.
+ * Collection of `Resource` items.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Resources
  * @extends   jf.JsonApi.CollectionBase
  */
-module.exports = class jfJsonApiErrors extends jfJsonApiCollectionBase
+class jfJsonApiResources extends jfJsonApiCollectionBase
 {
     /**
      * @override
@@ -16,4 +17,6 @@ module.exports = class jfJsonApiErrors extends jfJsonApiCollectionBase
     {
         return jfJsonApiResource;
     }
-};
+}
+
+module.exports = jfJsonApiResources;

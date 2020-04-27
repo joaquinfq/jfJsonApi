@@ -1,7 +1,9 @@
 const jfJsonApiBase         = require('./Base');
 const jfJsonApiRelationship = require('./Relationship');
+
 /**
  * The value of the relationships key MUST be an object (a `relationships object`).
+ *
  * Members of the relationships object (`relationships`) represent references from
  * the resource object in which it’s defined to other resource objects.
  *
@@ -9,9 +11,9 @@ const jfJsonApiRelationship = require('./Relationship');
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Relationships
- * @extends   jf.JsonApi.CollectionBase
+ * @extends   jf.JsonApi.Base
  */
-module.exports = class jfJsonApiRelationships extends jfJsonApiBase
+class jfJsonApiRelationships extends jfJsonApiBase
 {
     /**
      * @override
@@ -22,8 +24,10 @@ module.exports = class jfJsonApiRelationships extends jfJsonApiBase
         if (_isObject(values))
         {
             Object.keys(values)
-                .filter(key => _isObject(values[key]))
+                .filter(key  => _isObject(values[key]))
                 .forEach(key => this[key] = new jfJsonApiRelationship(values[key]));
         }
     }
-};
+}
+
+module.exports = jfJsonApiRelationships;

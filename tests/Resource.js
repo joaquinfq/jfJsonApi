@@ -77,7 +77,19 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
         );
         this._assert(
             '',
-            new jfJsonApiResource({ attributes : _instance }).toJSON(),
+            new jfJsonApiResource(_instance).toJSON(),
+            {
+                id         : _instance.modelId,
+                type       : _Class.TYPE,
+                attributes : {
+                    modelId : _instance.modelId,
+                    name    : _instance.name
+                }
+            }
+        );
+        this._assert(
+            '',
+            new jfJsonApiResource({ attributes: _instance }).toJSON(),
             {
                 id         : _instance.modelId,
                 type       : _Class.TYPE,
@@ -99,7 +111,7 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
         };
         this._assert(
             '',
-            new jfJsonApiResource({ attributes : _data }).toJSON(),
+            new jfJsonApiResource(_data).toJSON(),
             {
                 id         : _data.modelId,
                 type       : _data.__TYPE,
@@ -112,7 +124,7 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
         _data.__ID = 'abcde';
         this._assert(
             '',
-            new jfJsonApiResource({ attributes : _data }).toJSON(),
+            new jfJsonApiResource(_data).toJSON(),
             {
                 type       : _data.__TYPE,
                 attributes : {
@@ -121,9 +133,6 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
                 }
             }
         );
-        // Si la clave ID no existe, no se asignan los valores.
-        delete _data.__ID;
-        this._assert('', new jfJsonApiResource({ attributes : _data }).toJSON(), {});
         // Si la clave TYPE no existe, no se asignan los valores.
         _data.__ID = 'modelId';
         delete _data.__TYPE;

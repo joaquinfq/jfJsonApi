@@ -1,5 +1,6 @@
 const jfJsonApiCollectionBase = require('./CollectionBase');
 const jfJsonApiError          = require('./Error');
+
 /**
  * List of errors found.
  *
@@ -7,7 +8,7 @@ const jfJsonApiError          = require('./Error');
  * @class     jf.JsonApi.Errors
  * @extends   jf.JsonApi.CollectionBase
  */
-module.exports = class jfJsonApiErrors extends jfJsonApiCollectionBase
+class jfJsonApiErrors extends jfJsonApiCollectionBase
 {
     /**
      * @override
@@ -16,4 +17,6 @@ module.exports = class jfJsonApiErrors extends jfJsonApiCollectionBase
     {
         return jfJsonApiError;
     }
-};
+}
+
+module.exports = jfJsonApiErrors;

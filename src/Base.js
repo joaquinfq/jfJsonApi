@@ -1,17 +1,19 @@
 const jfObject = require('@jf/object');
+
 /**
- * Base class for all classes in application.
+ * Base class for others items.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Base
  * @extends   jf.Object
  */
-module.exports = class jfJsonApiBase extends jfObject
+class jfJsonApiBase extends jfObject
 {
     /**
      * Indicates if empty values are allowed in result.
      *
-     * @return {boolean} `true` if empty values are allowed,
+     * @property allowEmptyValues
+     * @type     {boolean}
      */
     get allowEmptyValues()
     {
@@ -29,11 +31,8 @@ module.exports = class jfJsonApiBase extends jfObject
 
     /**
      * Check if `value` has a right value.
-     * Only check JSON types.
      *
      * @param {*} value Value to check.
-     *
-     * @return {boolean} `true` is value is present.
      */
     hasValue(value)
     {
@@ -49,14 +48,9 @@ module.exports = class jfJsonApiBase extends jfObject
                     _hasValue = value !== '';
                     break;
                 case 'object':
-                    if (Array.isArray(value))
-                    {
-                        _hasValue = value.length > 0;
-                    }
-                    else
-                    {
-                        _hasValue = Object.keys(value).length > 0;
-                    }
+                    _hasValue = Array.isArray(value)
+                        ? value.length > 0
+                        : Object.keys(value).length > 0;
                     break;
             }
         }
@@ -114,13 +108,15 @@ module.exports = class jfJsonApiBase extends jfObject
     toJSON()
     {
         const _data = super.toJSON();
-        if (!this.allowEmptyValues)
+        if (!this.constructor.allowEmptyValues)
         {
             Object.keys(_data)
-                .filter(key => !this.hasValue(_data[key]))
+                .filter(key  => !this.hasValue(_data[key]))
                 .forEach(key => delete _data[key]);
         }
 
         return _data;
     }
-};
+}
+
+module.exports = jfJsonApiBase;

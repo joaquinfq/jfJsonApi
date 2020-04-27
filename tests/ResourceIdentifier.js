@@ -27,7 +27,7 @@ module.exports = class jfJsonApiResourceIdentifierTest extends jfJsonApiTestBase
     {
         return {
             allowEmptyValues : false,
-            id               : '',
+            id               : null,
             meta             : new jfJsonApiMeta(),
             type             : ''
         };
