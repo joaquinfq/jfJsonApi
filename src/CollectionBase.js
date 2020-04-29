@@ -10,7 +10,7 @@ const jfJsonApiBase = require('./Base');
 class jfJsonApiCollectionBase extends jfJsonApiBase
 {
     /**
-     * Class of each item in collection.
+     * Class reference of each item in collection.
      *
      * @property ITEM
      * @type     {jf.JsonApi.Base}
@@ -63,7 +63,7 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
      *
      * @param {string} property Property to use for getting group keys.
      * 
-     * @return {object[]} Items grouped by property.
+     * @return {object[]} Items grouped by value of property.
      */
     groupBy(property = 'id')
     {
@@ -93,9 +93,13 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
     }
     
     /**
-     * @override
+     * Parse values and add them to collection.
      *
-     * @NOTE Called from `jf.Object`.
+     * @NOTE      Called from `jf.Object`
+     * 
+     * @param {object[]} values Values to analyze.
+     * 
+     * @protected
      */
     _parseItems(values)
     {

@@ -2,7 +2,7 @@ const jfJsonApiCollectionBase = require('./CollectionBase');
 const jfJsonApiResource       = require('./Resource');
 
 /**
- * Collection of `Resource` items.
+ * List of `Resource` items.
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.Resources

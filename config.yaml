@@ -18,6 +18,7 @@ modules:
                             entity: NAME
                             id: false
                             plural: false
+                        'js\Collection':
                         'js\Factory':
 #                php:
         entities:
@@ -104,93 +105,6 @@ modules:
                             }
 
                             return _data;
-            CollectionBase:
-                base: Base
-                description: Base class for collections.
-                attributes:
-                    ITEM:
-                        description: Class of each item in collection
-                        abstract: true
-                        const: true
-                        nullable: false
-                        static: true
-                        type: Base
-                    items: Collection items({Base[],nullable=false})
-                methods:
-                    add:
-                        description: Add item to collection.
-                        params:
-                            config: Config to use for building item instance ({object})
-                        body: |
-                            if (config && typeof config === 'object')
-                            {
-                                this.items.push(new this.constructor.ITEM(config));
-                            }
-                    groupBy:
-                        description: Group all item using property value as key.
-                        params:
-                            property: Property to use for getting group keys ({value=id}).
-                        return: Items grouped by property ({object[]}).
-                        body: |
-                            const _groups = {};
-                            if (property && typeof property === 'string')
-                            {
-                                this.items.forEach(
-                                    item =>
-                                    {
-                                        if (property in item)
-                                        {
-                                            const _value = item[property];
-                                            if (_value in _groups)
-                                            {
-                                                _groups[_value].push(item);
-                                            }
-                                            else
-                                            {
-                                                _groups[_value] = [item];
-                                            }
-                                        }
-                                    }
-                                );
-                            }
-
-                            return _groups;
-                    _parseItems:
-                        override: true
-                        tags:
-                            - name: '@NOTE'
-                              value: Called from `jf.Object`.
-                        params:
-                            values:
-                                tags: false
-                        body: |
-                            if (Array.isArray(values))
-                            {
-                                this.setProperties(values);
-                            }
-                    setProperties:
-                        override: true
-                        params:
-                            values:
-                        body: |
-                            if (Array.isArray(values))
-                            {
-                                values
-                                    .filter(Boolean)
-                                    .forEach(this.add, this);
-                            }
-                            else
-                            {
-                                super.setProperties(values);
-                            }
-                    toJSON:
-                        override: true
-                        body: |
-                            const _data = super.toJSON();
-
-                            return this.hasValue(_data.items)
-                                ? _data.items
-                                : undefined;
             Attributes:
                 base: Meta
                 description: |
@@ -251,15 +165,6 @@ modules:
             Errors:
                 base: CollectionBase
                 description: List of errors found.
-                includes:
-                    Error:
-                attributes:
-                    ITEM:
-                        const: true
-                        override: true
-                        nullable: false
-                        static: true
-                        rawvalue: jfJsonApiError
             ErrorSource:
                 base: Base
                 description: An object containing references to the source of the error.
@@ -541,16 +446,7 @@ modules:
 
             Resources:
                 base: CollectionBase
-                description: Collection of `Resource` items.
-                includes:
-                    Resource:
-                attributes:
-                    ITEM:
-                        const: true
-                        override: true
-                        nullable: false
-                        static: true
-                        rawvalue: jfJsonApiResource
+                description: List of `Resource` items.
             ResourceIdentifier:
                 base: Base
                 defaults:

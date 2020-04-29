@@ -38,7 +38,13 @@ class jfJsonApiBase extends jfObject
     }
     
     /**
+     * Class constructor.
+     * 
+     * Assign config values that are properties to instance.
+     *
      * @override
+     *
+     * @param {object} config Values to assign to instance.
      */
     constructor(config)
     {
