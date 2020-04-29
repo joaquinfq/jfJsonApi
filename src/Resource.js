@@ -6,15 +6,15 @@ const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
 /**
  * The document's `primary data` is a representation of the resource or collection of resources
  * targeted by a request.
- *
+ * 
  * Every resource object MUST contain an id member and a type member. The values of the id and type
  * members MUST be strings.
- *
+ * 
  * Within a given API, each resource object's type and id pair MUST identify a single, unique resource.
  * The set of URIs controlled by a server, or multiple servers acting as one, constitute an API.
- *
+ * 
  * The type member is used to describe resource objects that share common attributes and relationships.
- *
+ * 
  * The values of type members MUST adhere to the same constraints as member names.
  *
  * @namespace jf.JsonApi
@@ -54,17 +54,17 @@ class jfJsonApiResource extends jfJsonApiResourceIdentifier
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-
+    
     /**
      * Check if `item` is an instance of `jf.dataType.Item` looking for properties `ID`
-     * and `TYPE` instead of add this package as dependency.
-     *
-     * If not is a `jf.dataType.Item`, then check if item has __ID && __TYPE properties.
+     * and `TYPE` instead of add this module as dependency.
+     * 
+     * If not is a `jf.dataType.Item`, then check if item has `__ID` and `__TYPE` properties.
      *
      * @param {object} item Item to check.
-     *
-     * @return {object}
-     *
+     * 
+     * @return  {object} Plain attribute object.
+     * 
      * @private
      */
     __checkAttributes(item)
@@ -99,10 +99,10 @@ class jfJsonApiResource extends jfJsonApiResourceIdentifier
                 Object.assign(_result, item);
             }
         }
-
+        
         return _result;
     }
-
+    
     /**
      * @override
      */

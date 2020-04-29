@@ -3,7 +3,7 @@ const jfJsonApiMeta = require('./Meta');
 
 /**
  * Each member of a links object is a `link`. A link MUST be represented as either:
- *
+ * 
  * - A string containing the link's URL.
  * - An object (`link object`) which can contain the following members:
  *   - href: A string containing the link's URL.
@@ -38,7 +38,7 @@ class jfJsonApiLink extends jfJsonApiBase
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-
+    
     /**
      * @override
      */
@@ -52,7 +52,7 @@ class jfJsonApiLink extends jfJsonApiBase
                 ? super.toJSON()
                 : this.href;
         }
-
+        
         return _data;
     }
 }

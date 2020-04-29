@@ -5,7 +5,7 @@ const jfJsonApiBase = require('./Base');
  *
  * @namespace jf.JsonApi
  * @class     jf.JsonApi.CollectionBase
- * @extends   jf.dataType.Collection
+ * @extends   jf.JsonApi.Base
  */
 class jfJsonApiCollectionBase extends jfJsonApiBase
 {

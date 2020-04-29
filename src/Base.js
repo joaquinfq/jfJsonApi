@@ -19,7 +19,7 @@ class jfJsonApiBase extends jfObject
     {
         return false;
     }
-
+    
     /**
      * @override
      */
@@ -28,11 +28,13 @@ class jfJsonApiBase extends jfObject
         super();
         this.setProperties(config);
     }
-
+    
     /**
      * Check if `value` has a right value.
      *
      * @param {*} value Value to check.
+     * 
+     * @return {boolean} `true` if value is present.
      */
     hasValue(value)
     {
@@ -54,10 +56,10 @@ class jfJsonApiBase extends jfObject
                     break;
             }
         }
-
+        
         return _hasValue;
     }
-
+    
     /**
      * Keep only keys in `keys` parameter.
      *
@@ -70,11 +72,11 @@ class jfJsonApiBase extends jfObject
         if (typeof _values === 'object' && this.hasValue(_values))
         {
             Object.keys(_values)
-                .filter(key => !keys.includes(key))
+                .filter(key  => !keys.includes(key))
                 .forEach(key => delete _values[key]);
         }
     }
-
+    
     /**
      * @override
      */
@@ -101,7 +103,7 @@ class jfJsonApiBase extends jfObject
             super.setProperties(_values);
         }
     }
-
+    
     /**
      * @override
      */
@@ -111,10 +113,10 @@ class jfJsonApiBase extends jfObject
         if (!this.constructor.allowEmptyValues)
         {
             Object.keys(_data)
-                .filter(key  => !this.hasValue(_data[key]))
+                .filter(key => !this.hasValue(_data[key]))
                 .forEach(key => delete _data[key]);
         }
-
+        
         return _data;
     }
 }

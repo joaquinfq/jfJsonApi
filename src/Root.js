@@ -8,7 +8,7 @@ const jfJsonApiResources = require('./Resources');
 
 /**
  * A JSON object MUST be at the root of every JSON API request and response containing data.
- *
+ * 
  * This object defines a document's `top level`.
  *
  * @namespace jf.JsonApi
@@ -27,7 +27,7 @@ class jfJsonApiRoot extends jfJsonApiBase
     {
         return 'application/vnd.api+json';
     }
-
+    
     /**
      * @override
      */
@@ -79,7 +79,7 @@ class jfJsonApiRoot extends jfJsonApiBase
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-
+    
     /**
      * Add an item to response data.
      *
@@ -97,14 +97,14 @@ class jfJsonApiRoot extends jfJsonApiBase
             this.setProperties({ data });
         }
     }
-
+    
     /**
      * Add data to include section.
      *
-     * @NOTE  Called from `jf.Object`.
-     *
+     * @NOTE      Called from `jf.Object`.
+     * 
      * @param {object} item Item to add to include section.
-     *
+     * 
      * @protected
      */
     _parseData(item)
@@ -125,14 +125,14 @@ class jfJsonApiRoot extends jfJsonApiBase
             this.data = new jfJsonApiResource(item);
         }
     }
-
+    
     /**
      * Parse items and add them to include section.
      *
-     * @NOTE  Called from `jf.Object`.
-     *
+     * @NOTE      Called from `jf.Object`.
+     * 
      * @param {array|object} items Items to add to include section.
-     *
+     * 
      * @protected
      */
     _parseIncluded(items)
@@ -146,7 +146,7 @@ class jfJsonApiRoot extends jfJsonApiBase
             this.included.add(items);
         }
     }
-
+    
     /**
      * Return instance value as needed in user application.
      *
@@ -178,10 +178,10 @@ class jfJsonApiRoot extends jfJsonApiBase
         }
         Object.keys(_appData)
             .forEach(type => _appData[type] = _appData[type].map(item => item.toJSON().attributes));
-
+        
         return _app;
     }
-
+    
     /**
      * @override
      */
@@ -215,10 +215,10 @@ class jfJsonApiRoot extends jfJsonApiBase
                 }
             }
         }
-
+        
         return _data;
     }
-
+    
     /**
      * Return instance value as needed in server application.
      *

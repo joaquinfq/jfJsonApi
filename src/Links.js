@@ -3,11 +3,11 @@ const jfJsonApiLink = require('./Link');
 
 /**
  * Where specified, a links member can be used to represent links.
- *
+ * 
  * The value of each `links` member MUST be an object (a `link object`).
- *
+ * 
  * A links object containing at least one of the following:
- *
+ * 
  * - related: A related resource link.
  * - self:    A link for the relationship itself (a `relationship link`).
  *            This link allows the client to directly manipulate the relationship.
@@ -75,7 +75,7 @@ class jfJsonApiLinks extends jfJsonApiBase
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-
+    
     /**
      * @override
      */

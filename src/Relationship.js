@@ -42,7 +42,7 @@ class jfJsonApiRelationship extends jfJsonApiBase
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-
+    
     /**
      * @override
      */
@@ -55,7 +55,7 @@ class jfJsonApiRelationship extends jfJsonApiBase
         {
             _data.links = null;
         }
-
+        
         return this.hasValue(_data.meta) || this.hasValue(_data.data) || this.hasValue(_data.links)
             ? _data
             : undefined;
