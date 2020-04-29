@@ -28,7 +28,7 @@ class jfJsonApiBase extends jfObject
     {
         return false;
     }
-    
+
     /**
      * Name used to register class in factory.
      */
@@ -36,10 +36,10 @@ class jfJsonApiBase extends jfObject
     {
         return 'Base';
     }
-    
+
     /**
      * Class constructor.
-     * 
+     *
      * Assign config values that are properties to instance.
      *
      * @override
@@ -51,12 +51,12 @@ class jfJsonApiBase extends jfObject
         super();
         this.setProperties(config);
     }
-    
+
     /**
      * Check if `value` has a right value.
      *
      * @param {*} value Value to check.
-     * 
+     *
      * @return {boolean} `true` if value is present.
      */
     hasValue(value)
@@ -79,10 +79,10 @@ class jfJsonApiBase extends jfObject
                     break;
             }
         }
-        
+
         return _hasValue;
     }
-    
+
     /**
      * Keep only keys in `keys` parameter.
      *
@@ -99,7 +99,7 @@ class jfJsonApiBase extends jfObject
                 .forEach(key => delete _values[key]);
         }
     }
-    
+
     /**
      * @override
      */
@@ -126,20 +126,20 @@ class jfJsonApiBase extends jfObject
             super.setProperties(_values);
         }
     }
-    
+
     /**
      * @override
      */
     toJSON()
     {
         const _data = super.toJSON();
-        if (!this.constructor.allowEmptyValues)
+        if (!this.allowEmptyValues)
         {
             Object.keys(_data)
                 .filter(key => !this.hasValue(_data[key]))
                 .forEach(key => delete _data[key]);
         }
-        
+
         return _data;
     }
 }

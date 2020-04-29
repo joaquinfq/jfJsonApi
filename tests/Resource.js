@@ -51,12 +51,13 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
 
     testSetPropertiesDataTypeModel()
     {
-        const _Class = class
+        const _Class    = class
         {
             static get ID()
             {
                 return 'modelId';
             }
+
             static get TYPE()
             {
                 return 'integer';
@@ -89,7 +90,7 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
         );
         this._assert(
             '',
-            new jfJsonApiResource({ attributes: _instance }).toJSON(),
+            new jfJsonApiResource({ attributes : _instance }).toJSON(),
             {
                 id         : _instance.modelId,
                 type       : _Class.TYPE,
@@ -99,6 +100,45 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
                 }
             }
         );
+    }
+
+    testSetPropertiesObject()
+    {
+        let _data = {
+            attributes : {
+                modelId : Math.random(),
+                name    : 'ModelName'
+            }
+        };
+        this._assert('', new jfJsonApiResource(_data).toJSON(), {});
+        // Si no existe `type`, se elimina `attributes`.
+        _data = {
+            id         : Math.random(),
+            attributes : {
+                modelId : Math.random(),
+                name    : 'ModelName'
+            }
+        };
+        this._assert('', new jfJsonApiResource(_data).toJSON(), { id : _data.id });
+        // Si no existe `id`, se deja `attributes`.
+        _data = {
+            type       : Math.random(),
+            attributes : {
+                modelId : Math.random(),
+                name    : 'ModelName'
+            }
+        };
+        this._assert('', new jfJsonApiResource(_data).toJSON(), _data);
+        // Si ambos existen, todo queda igual.
+        _data = {
+            id         : Math.random(),
+            type       : Math.random(),
+            attributes : {
+                modelId : Math.random(),
+                name    : 'ModelName'
+            }
+        };
+        this._assert('', new jfJsonApiResource(_data).toJSON(), _data);
     }
 
     testSetPropertiesObjectModel()
@@ -134,8 +174,22 @@ module.exports = class ResourceTest extends jfJsonApiResourceIdentifierTest
             }
         );
         // Si la clave TYPE no existe, no se asignan los valores.
-        _data.__ID = 'modelId';
-        delete _data.__TYPE;
-        this._assert('', new jfJsonApiResource({ attributes : _data }).toJSON(), {});
+        let _d = { ..._data, __ID : 'modelId' };
+        delete _d.__TYPE;
+        this._assert('', new jfJsonApiResource({ attributes : _d }).toJSON(), {});
+        // Si la clave ID no existe pero existe TYPE, se asignan los valores porque se puede estar creando un recurso.
+        _d        = { ..._data };
+        _d.__TYPE = 'string';
+        this._assert(
+            '',
+            new jfJsonApiResource(_data).toJSON(),
+            {
+                type       : _d.__TYPE,
+                attributes : {
+                    modelId : _d.modelId,
+                    name    : _d.name
+                }
+            }
+        );
     }
 };

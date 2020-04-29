@@ -23,7 +23,8 @@ module.exports = class jfJsonApiResourcesTest extends jfTestsUnit
         this._testDefinition(
             jfJsonApiResources,
             {
-                ITEM : jfJsonApiResource
+                ITEM : jfJsonApiResource,
+                NAME : 'Resources'
             },
             {
                 allowEmptyValues : false

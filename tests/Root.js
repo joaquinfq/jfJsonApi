@@ -27,10 +27,12 @@ module.exports = class jfJsonApiRootTest extends jfTestsUnit
     {
         this._testDefinition(
             jfJsonApiRoot,
-            null,
+            {
+                NAME : 'Root'
+            },
             {
                 allowEmptyValues : false,
-                data             : new jfJsonApiResource(),
+                data             : new jfJsonApiResources(),
                 errors           : new jfJsonApiErrors(),
                 included         : new jfJsonApiResources(),
                 links            : new jfJsonApiLinks(),
@@ -53,13 +55,21 @@ module.exports = class jfJsonApiRootTest extends jfTestsUnit
      */
     testAddData()
     {
-    }
-
-    /**
-     * Pruebas del método `constructor`.
-     */
-    testConstructor()
-    {
+        let _add         = 0;
+        let _parseData   = 0;
+        const _root      = new jfJsonApiRoot({ data : null });
+        const _resource  = new jfJsonApiResource();
+        _resource.add    = () => ++_add;
+        _root._parseData = () => ++_parseData;
+        const _values    = this.constructor.getAllTypes();
+        _values.forEach(_root.addData, _root);
+        this._assert('', _add, 0);
+        this._assert('', _parseData, _values.length);
+        const _length = Math.ceil(Math.random() * 20) + 5;
+        _root.data    = _resource;
+        Array.from({ length : _length }).forEach(() => _root.addData(new jfJsonApiResource()));
+        this._assert('', _add, _length);
+        this._assert('', _parseData, _values.length);
     }
 
     /**

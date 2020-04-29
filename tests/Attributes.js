@@ -21,6 +21,22 @@ module.exports = class jfJsonApiAttributesTest extends jfJsonApiMetaTests
     }
 
     /**
+     * Comprueba la definición de la clase.
+     */
+    testDefinition()
+    {
+        this._testDefinition(
+            jfJsonApiAttributes,
+            {
+                NAME : 'Attributes'
+            },
+            {
+                allowEmptyValues : true
+            }
+        );
+    }
+
+    /**
      * Comprueba la herencia de la clase.
      */
     testInheritance()

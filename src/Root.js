@@ -5,14 +5,14 @@ require('./Errors');
 require('./JsonApi');
 require('./Links');
 require('./Meta');
-require('./Resources');
 //-----------------------------------------------------------------------------
-const jfJsonApiBase     = require('./Base');
-const jfJsonApiResource = require('./Resource');
+const jfJsonApiBase      = require('./Base');
+const jfJsonApiResource  = require('./Resource');
+const jfJsonApiResources = require('./Resources');
 
 /**
  * A JSON object MUST be at the root of every JSON API request and response containing data.
- * 
+ *
  * This object defines a document's `top level`.
  *
  * @namespace jf.JsonApi
@@ -31,7 +31,7 @@ class jfJsonApiRoot extends jfJsonApiBase
     {
         return 'application/vnd.api+json';
     }
-    
+
     /**
      * Name used to register class in factory.
      */
@@ -39,7 +39,7 @@ class jfJsonApiRoot extends jfJsonApiBase
     {
         return 'Root';
     }
-    
+
     /**
      * @override
      */
@@ -50,9 +50,9 @@ class jfJsonApiRoot extends jfJsonApiBase
          * The document's primary data.
          *
          * @property data
-         * @type     {jf.JsonApi.Resource}
+         * @type     {jf.JsonApi.Resources}
          */
-        this.data = jfJsonApiBase.create('Resource');
+        this.data = jfJsonApiBase.create('Resources');
         /**
          * Array of error objects.
          *
@@ -91,7 +91,7 @@ class jfJsonApiRoot extends jfJsonApiBase
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-    
+
     /**
      * Add an item to response data.
      *
@@ -106,30 +106,30 @@ class jfJsonApiRoot extends jfJsonApiBase
         }
         else
         {
-            this.setProperties({ data });
+            this._parseData(data);
         }
     }
-    
+
     /**
      * Add data to include section.
      *
      * @NOTE      Called from `jf.Object`.
-     * 
+     *
      * @param {object} item Item to add to include section.
-     * 
+     *
      * @protected
      */
     _parseData(item)
     {
         if (Array.isArray(item))
         {
-            if (this.data instanceof jfJsonApiResource)
+            if (this.data instanceof jfJsonApiResources)
             {
                 this.data.setProperties(item);
             }
             else
             {
-                this.data = jfJsonApiBase.create('Resource', item);
+                this.data = jfJsonApiBase.create('Resources', item);
             }
         }
         else
@@ -137,14 +137,14 @@ class jfJsonApiRoot extends jfJsonApiBase
             this.data = jfJsonApiBase.create('Resource', item);
         }
     }
-    
+
     /**
      * Parse items and add them to include section.
      *
      * @NOTE      Called from `jf.Object`.
-     * 
+     *
      * @param {array|object} items Items to add to include section.
-     * 
+     *
      * @protected
      */
     _parseIncluded(items)
@@ -158,7 +158,7 @@ class jfJsonApiRoot extends jfJsonApiBase
             this.included.add(items);
         }
     }
-    
+
     /**
      * Return instance value as needed in user application.
      *
@@ -190,10 +190,10 @@ class jfJsonApiRoot extends jfJsonApiBase
         }
         Object.keys(_appData)
             .forEach(type => _appData[type] = _appData[type].map(item => item.toJSON().attributes));
-        
+
         return _app;
     }
-    
+
     /**
      * @override
      */
@@ -227,10 +227,10 @@ class jfJsonApiRoot extends jfJsonApiBase
                 }
             }
         }
-        
+
         return _data;
     }
-    
+
     /**
      * Return instance value as needed in server application.
      *

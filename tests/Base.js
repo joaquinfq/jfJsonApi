@@ -89,6 +89,20 @@ module.exports = class jfJsonApiBaseTest extends jfTestsUnit
         _sut.data = _data;
         _sut.keepKeys('data', ['c']);
         this._assert('', _sut.data, { c : _value });
+        // Si data está vacío, no hace nada.
+        _sut.data = {};
+        _sut.keepKeys('data', ['c']);
+        this._assert('', _sut.data, {});
+        // Si data no es un objeto, no hace nada.
+        this.constructor.getAllTypes()
+            .filter(value => value && typeof value !== 'object')
+            .forEach(
+                value => {
+                    _sut.data = value;
+                    _sut.keepKeys('data', ['a','b','c','d','e']);
+                    this._assert('', _sut.data, value);
+                }
+            );
     }
 
     /**
@@ -104,6 +118,36 @@ module.exports = class jfJsonApiBaseTest extends jfTestsUnit
      */
     testToJSON()
     {
-        const _sut = this.sut;
+        let _aev   = true;
+        const _Sut = class extends jfJsonApiBase
+        {
+            get allowEmptyValues()
+            {
+                return _aev;
+            }
+        };
+        const _sut = new _Sut();
+        const _values = this.constructor.getAllTypes().filter(v => v !== undefined && typeof v !== 'function');
+        let _expected = {};
+        _values.forEach(
+            (value, index) => {
+                const _key      = String.fromCharCode(65 + index);
+                _sut[_key]      = value;
+                _expected[_key] = value;
+            }
+        );
+        this._assert('', _sut.toJSON(), _expected);
+        _aev      = false;
+        _expected = {};
+        _values.forEach(
+            (value, index) => {
+                if (value !== undefined && value !== '' && value !== null && (!Array.isArray(value) || value.length > 0) && (!jfJsonApiBase.isObject(value) || Object.keys(value).length > 0))
+                {
+                    const _key      = String.fromCharCode(65 + index);
+                    _expected[_key] = value;
+                }
+            }
+        );
+        this._assert('', _sut.toJSON(), _expected);
     }
 };
