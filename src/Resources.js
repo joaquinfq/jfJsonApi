@@ -17,6 +17,19 @@ class jfJsonApiResources extends jfJsonApiCollectionBase
     {
         return jfJsonApiResource;
     }
+    
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Resources';
+    }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiCollectionBase.register(jfJsonApiResources.NAME, jfJsonApiResources);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiResources;

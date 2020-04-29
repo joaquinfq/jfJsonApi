@@ -1,7 +1,11 @@
-const jfJsonApiBase               = require('./Base');
-const jfJsonApiLinks              = require('./Links');
-const jfJsonApiMeta               = require('./Meta');
-const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./Links');
+require('./Meta');
+require('./ResourceIdentifier');
+//-----------------------------------------------------------------------------
+const jfJsonApiBase = require('./Base');
 
 /**
  * Represent references from the resource object in which it's defined to other resource objects.
@@ -12,6 +16,14 @@ const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
  */
 class jfJsonApiRelationship extends jfJsonApiBase
 {
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Relationship';
+    }
+    
     /**
      * @override
      */
@@ -24,21 +36,21 @@ class jfJsonApiRelationship extends jfJsonApiBase
          * @property data
          * @type     {jf.JsonApi.ResourceIdentifier}
          */
-        this.data = new jfJsonApiResourceIdentifier();
+        this.data = jfJsonApiBase.create('ResourceIdentifier');
         /**
          * A links object containing with information about relationship.
          *
          * @property links
          * @type     {jf.JsonApi.Links}
          */
-        this.links = new jfJsonApiLinks();
+        this.links = jfJsonApiBase.create('Links');
         /**
          * Meta object containing non-standard meta-information about the relationship.
          *
          * @property meta
          * @type     {jf.JsonApi.Meta}
          */
-        this.meta = new jfJsonApiMeta();
+        this.meta = jfJsonApiBase.create('Meta');
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
@@ -62,4 +74,9 @@ class jfJsonApiRelationship extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiRelationship.NAME, jfJsonApiRelationship);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiRelationship;

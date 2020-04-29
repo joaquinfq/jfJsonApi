@@ -19,6 +19,18 @@ const jfJsonApiMeta = require('./Meta');
  */
 class jfJsonApiAttributes extends jfJsonApiMeta
 {
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Attributes';
+    }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiMeta.register(jfJsonApiAttributes.NAME, jfJsonApiAttributes);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiAttributes;

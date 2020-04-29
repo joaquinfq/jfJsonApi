@@ -19,7 +19,15 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
     {
         throw new Error('Abstract property');
     }
-
+    
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'CollectionBase';
+    }
+    
     /**
      * @override
      */
@@ -36,7 +44,7 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
-
+    
     /**
      * Add item to collection.
      *
@@ -49,12 +57,12 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
             this.items.push(new this.constructor.ITEM(config));
         }
     }
-
+    
     /**
      * Group all item using property value as key.
      *
      * @param {string} property Property to use for getting group keys.
-     *
+     * 
      * @return {object[]} Items grouped by property.
      */
     groupBy(property = 'id')
@@ -80,10 +88,10 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
                 }
             );
         }
-
+        
         return _groups;
     }
-
+    
     /**
      * @override
      *
@@ -96,7 +104,7 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
             this.setProperties(values);
         }
     }
-
+    
     /**
      * @override
      */
@@ -113,18 +121,23 @@ class jfJsonApiCollectionBase extends jfJsonApiBase
             super.setProperties(values);
         }
     }
-
+    
     /**
      * @override
      */
     toJSON()
     {
         const _data = super.toJSON();
-
+        
         return this.hasValue(_data.items)
             ? _data.items
             : undefined;
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiCollectionBase.NAME, jfJsonApiCollectionBase);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiCollectionBase;

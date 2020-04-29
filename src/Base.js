@@ -1,4 +1,13 @@
-const jfObject = require('@jf/object');
+const jfFactory = require('@jf/factory');
+const jfObject  = require('@jf/object');
+
+/**
+ * Factory for all classes in package.
+ *
+ * @type {jf.Factory}
+ */
+const factory      = jfFactory.i('jf.JsonApi');
+factory.initMethod = 'setProperties';
 
 /**
  * Base class for others items.
@@ -18,6 +27,14 @@ class jfJsonApiBase extends jfObject
     get allowEmptyValues()
     {
         return false;
+    }
+    
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Base';
     }
     
     /**
@@ -121,4 +138,10 @@ class jfJsonApiBase extends jfObject
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+factory.attach(jfJsonApiBase, [ 'create', 'register' ]);
+factory.register(jfJsonApiBase.NAME, jfJsonApiBase);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiBase;

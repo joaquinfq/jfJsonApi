@@ -22,6 +22,14 @@ class jfJsonApiMeta extends jfJsonApiBase
     }
     
     /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Meta';
+    }
+    
+    /**
      * @override
      */
     setProperties(values)
@@ -33,4 +41,9 @@ class jfJsonApiMeta extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiMeta.NAME, jfJsonApiMeta);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiMeta;

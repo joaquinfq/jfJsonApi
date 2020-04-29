@@ -10,6 +10,14 @@ const jfJsonApiBase = require('./Base');
 class jfJsonApiErrorLink extends jfJsonApiBase
 {
     /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'ErrorLink';
+    }
+    
+    /**
      * @override
      */
     constructor(config)
@@ -27,4 +35,9 @@ class jfJsonApiErrorLink extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiErrorLink.NAME, jfJsonApiErrorLink);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiErrorLink;

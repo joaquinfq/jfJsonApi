@@ -1,6 +1,10 @@
-const jfJsonApiBase        = require('./Base');
-const jfJsonApiErrorLink   = require('./ErrorLink');
-const jfJsonApiErrorSource = require('./ErrorSource');
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./ErrorLink');
+require('./ErrorSource');
+//-----------------------------------------------------------------------------
+const jfJsonApiBase = require('./Base');
 
 /**
  * A server MAY choose to stop processing as soon as a problem is encountered, or
@@ -19,6 +23,14 @@ const jfJsonApiErrorSource = require('./ErrorSource');
  */
 class jfJsonApiError extends jfJsonApiBase
 {
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Error';
+    }
+    
     /**
      * @override
      */
@@ -53,7 +65,7 @@ class jfJsonApiError extends jfJsonApiBase
          * @property links
          * @type     {jf.JsonApi.ErrorLink}
          */
-        this.links = new jfJsonApiErrorLink();
+        this.links = jfJsonApiBase.create('ErrorLink');
         /**
          * A meta object containing non-standard meta-information about the error.
          *
@@ -67,7 +79,7 @@ class jfJsonApiError extends jfJsonApiBase
          * @property source
          * @type     {jf.JsonApi.ErrorSource}
          */
-        this.source = new jfJsonApiErrorSource();
+        this.source = jfJsonApiBase.create('ErrorSource');
         /**
          * The HTTP status code applicable to this problem, expressed as a string value.
          *
@@ -99,4 +111,9 @@ class jfJsonApiError extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiError.NAME, jfJsonApiError);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiError;

@@ -16,6 +16,7 @@
         "url": "https://github.com/joaquinfq/jfJsonApi"
     },
     "dependencies": {
+        "@jf/factory": "^2.1.1",
         "@jf/object": "^3.0.1"
     },
     "devDependencies": {

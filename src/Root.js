@@ -1,10 +1,14 @@
-const jfJsonApiBase      = require('./Base');
-const jfJsonApiErrors    = require('./Errors');
-const jfJsonApiJsonApi   = require('./JsonApi');
-const jfJsonApiLinks     = require('./Links');
-const jfJsonApiMeta      = require('./Meta');
-const jfJsonApiResource  = require('./Resource');
-const jfJsonApiResources = require('./Resources');
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./Errors');
+require('./JsonApi');
+require('./Links');
+require('./Meta');
+require('./Resources');
+//-----------------------------------------------------------------------------
+const jfJsonApiBase     = require('./Base');
+const jfJsonApiResource = require('./Resource');
 
 /**
  * A JSON object MUST be at the root of every JSON API request and response containing data.
@@ -29,6 +33,14 @@ class jfJsonApiRoot extends jfJsonApiBase
     }
     
     /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Root';
+    }
+    
+    /**
      * @override
      */
     constructor(config)
@@ -40,42 +52,42 @@ class jfJsonApiRoot extends jfJsonApiBase
          * @property data
          * @type     {jf.JsonApi.Resource}
          */
-        this.data = new jfJsonApiResource();
+        this.data = jfJsonApiBase.create('Resource');
         /**
          * Array of error objects.
          *
          * @property errors
          * @type     {jf.JsonApi.Errors}
          */
-        this.errors = new jfJsonApiErrors();
+        this.errors = jfJsonApiBase.create('Errors');
         /**
          * An array of resource objects that are related to the primary data and/or each other.
          *
          * @property included
          * @type     {jf.JsonApi.Resources}
          */
-        this.included = new jfJsonApiResources();
+        this.included = jfJsonApiBase.create('Resources');
         /**
          * An object describing the server's implementation.
          *
          * @property jsonapi
          * @type     {jf.JsonApi.JsonApi}
          */
-        this.jsonapi = new jfJsonApiJsonApi();
+        this.jsonapi = jfJsonApiBase.create('JsonApi');
         /**
          * An object describing the server's implementation.
          *
          * @property links
          * @type     {jf.JsonApi.Links}
          */
-        this.links = new jfJsonApiLinks();
+        this.links = jfJsonApiBase.create('Links');
         /**
          * The document's metadata.
          *
          * @property meta
          * @type     {jf.JsonApi.Meta}
          */
-        this.meta = new jfJsonApiMeta();
+        this.meta = jfJsonApiBase.create('Meta');
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
@@ -88,7 +100,7 @@ class jfJsonApiRoot extends jfJsonApiBase
     addData(data)
     {
         let _current = this.data;
-        if (_current instanceof jfJsonApiResources)
+        if (_current instanceof jfJsonApiResource)
         {
             _current.add(data);
         }
@@ -111,18 +123,18 @@ class jfJsonApiRoot extends jfJsonApiBase
     {
         if (Array.isArray(item))
         {
-            if (this.data instanceof jfJsonApiResources)
+            if (this.data instanceof jfJsonApiResource)
             {
                 this.data.setProperties(item);
             }
             else
             {
-                this.data = new jfJsonApiResources(item);
+                this.data = jfJsonApiBase.create('Resource', item);
             }
         }
         else
         {
-            this.data = new jfJsonApiResource(item);
+            this.data = jfJsonApiBase.create('Resource', item);
         }
     }
     
@@ -232,4 +244,9 @@ class jfJsonApiRoot extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiRoot.NAME, jfJsonApiRoot);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiRoot;

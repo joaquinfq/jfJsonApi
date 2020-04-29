@@ -1,5 +1,9 @@
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./Meta');
+//-----------------------------------------------------------------------------
 const jfJsonApiBase = require('./Base');
-const jfJsonApiMeta = require('./Meta');
 
 /**
  * Each member of a links object is a `link`. A link MUST be represented as either:
@@ -15,6 +19,14 @@ const jfJsonApiMeta = require('./Meta');
  */
 class jfJsonApiLink extends jfJsonApiBase
 {
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Link';
+    }
+    
     /**
      * @override
      */
@@ -34,7 +46,7 @@ class jfJsonApiLink extends jfJsonApiBase
          * @property meta
          * @type     {jf.JsonApi.Meta}
          */
-        this.meta = new jfJsonApiMeta();
+        this.meta = jfJsonApiBase.create('Meta');
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
@@ -57,4 +69,9 @@ class jfJsonApiLink extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiLink.NAME, jfJsonApiLink);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiLink;

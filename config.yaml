@@ -1,266 +1,721 @@
-package: jf.JsonApi
+name: jf.JsonApi
 description: Classes for implementing JSON API specification easily.
 version: 1.0.0
-collections:
-    Base:
-        basename: jf.dataType.Collection
-        methods:
-            toJSON:
-                override: '@override'
-                body: |
-                    const _data = super.toJSON();
 
-                    return this.hasValue(_data)
-                        ? _data
-                        : undefined;
-
-    Errors:
-        description: List of errors found.
-        item: Error
-
-    Relationships:
-        description: List of relationships.
-        item: Relationship
-
-
-    Resources:
-        description: List of resources.
-        item: Resource
-
-types:
-    Base:
-        basename: jf.dataType.Item
-        const:
-            allowEmptyValues:
-                description: Indicates if empty values are allowed in result
-                type: boolean
-                value: false
-        methods:
-            hasValue:
-                description: |
-                    Check if `value` has a right value.
-                params:
-                    value: Value to check (*)
-                return:
-                    description: "`true` is value is present."
-                    type: boolean
-                body: |
-                    let _hasValue = value !== null && value !== undefined;
-                    if (_hasValue)
-                    {
-                        switch (typeof value)
-                        {
-                            case 'function':
-                                _hasValue = false;
-                                break;
-                            case 'string':
-                                _hasValue = value !== '';
-                                break;
-                            case 'object':
-                                if (Array.isArray(value))
+modules:
+    code:
+        description: Classes for implementing JSON API specification easily.
+        defaults:
+            entities:
+                id: false
+        output:
+            lang:
+                node-js:
+                    filename: 'src/{name}'
+                    join: ''
+                    plugins:
+                        Constants:
+                            entity: NAME
+                            id: false
+                            plural: false
+                        'js\Factory':
+#                php:
+        entities:
+            Base:
+                base: jf.Object
+                description: Base class for others items.
+                attributes:
+                    allowEmptyValues: Indicates if empty values are allowed in result ({boolean,const=true,nullable=false,value=false})
+                methods:
+                    constructor: !yaml $$lang$$/js/constructor-set-properties
+                    hasValue:
+                        description: Check if `value` has a right value.
+                        return: "`true` if value is present. ({boolean})"
+                        params:
+                            value: Value to check ({*})
+                        body: |
+                            let _hasValue = value !== null && value !== undefined;
+                            if (_hasValue)
+                            {
+                                switch (typeof value)
                                 {
-                                    _hasValue = value.length > 0;
+                                    case 'function':
+                                        _hasValue = false;
+                                        break;
+                                    case 'string':
+                                        _hasValue = value !== '';
+                                        break;
+                                    case 'object':
+                                        _hasValue = Array.isArray(value)
+                                            ? value.length > 0
+                                            : Object.keys(value).length > 0;
+                                        break;
+                                }
+                            }
+
+                            return _hasValue;
+                    keepKeys:
+                        description: Keep only keys in `keys` parameter.
+                        params:
+                            property: Property to check ({nullable=false})
+                            keys: Keys to keep ({string[]})
+                        body: |
+                            const _values = this[property];
+                            if (typeof _values === 'object' && this.hasValue(_values))
+                            {
+                                Object.keys(_values)
+                                    .filter(key  => !keys.includes(key))
+                                    .forEach(key => delete _values[key]);
+                            }
+                    setProperties:
+                        override: true
+                        params:
+                            values:
+                        body: |
+                            if (values && typeof values === 'object')
+                            {
+                                const _values = {};
+                                Object.keys(values).forEach(
+                                    key =>
+                                    {
+                                        const _current = this[key];
+                                        const _value   = values[key];
+                                        if (_current instanceof jfJsonApiBase)
+                                        {
+                                            this[key] = new _current.constructor(_value);
+                                        }
+                                        else
+                                        {
+                                            _values[key] = _value;
+                                        }
+                                    }
+                                );
+                                super.setProperties(_values);
+                            }
+                    toJSON:
+                        override: true
+                        body: |
+                            const _data = super.toJSON();
+                            if (!this.constructor.allowEmptyValues)
+                            {
+                                Object.keys(_data)
+                                    .filter(key => !this.hasValue(_data[key]))
+                                    .forEach(key => delete _data[key]);
+                            }
+
+                            return _data;
+            CollectionBase:
+                base: Base
+                description: Base class for collections.
+                attributes:
+                    ITEM:
+                        description: Class of each item in collection
+                        abstract: true
+                        const: true
+                        nullable: false
+                        static: true
+                        type: Base
+                    items: Collection items({Base[],nullable=false})
+                methods:
+                    add:
+                        description: Add item to collection.
+                        params:
+                            config: Config to use for building item instance ({object})
+                        body: |
+                            if (config && typeof config === 'object')
+                            {
+                                this.items.push(new this.constructor.ITEM(config));
+                            }
+                    groupBy:
+                        description: Group all item using property value as key.
+                        params:
+                            property: Property to use for getting group keys ({value=id}).
+                        return: Items grouped by property ({object[]}).
+                        body: |
+                            const _groups = {};
+                            if (property && typeof property === 'string')
+                            {
+                                this.items.forEach(
+                                    item =>
+                                    {
+                                        if (property in item)
+                                        {
+                                            const _value = item[property];
+                                            if (_value in _groups)
+                                            {
+                                                _groups[_value].push(item);
+                                            }
+                                            else
+                                            {
+                                                _groups[_value] = [item];
+                                            }
+                                        }
+                                    }
+                                );
+                            }
+
+                            return _groups;
+                    _parseItems:
+                        override: true
+                        tags:
+                            - name: '@NOTE'
+                              value: Called from `jf.Object`.
+                        params:
+                            values:
+                                tags: false
+                        body: |
+                            if (Array.isArray(values))
+                            {
+                                this.setProperties(values);
+                            }
+                    setProperties:
+                        override: true
+                        params:
+                            values:
+                        body: |
+                            if (Array.isArray(values))
+                            {
+                                values
+                                    .filter(Boolean)
+                                    .forEach(this.add, this);
+                            }
+                            else
+                            {
+                                super.setProperties(values);
+                            }
+                    toJSON:
+                        override: true
+                        body: |
+                            const _data = super.toJSON();
+
+                            return this.hasValue(_data.items)
+                                ? _data.items
+                                : undefined;
+            Attributes:
+                base: Meta
+                description: |
+                    The value of the attributes key MUST be an object (an `attributes object`).
+                    Members of the attributes object (`attributes`) represent information about the resource object in which it's defined.
+
+                    Attributes may contain any valid JSON value.
+
+                    Complex data structures involving JSON objects and arrays are allowed as attribute values.
+                    However, any object that constitutes or is contained in an attribute MUST NOT contain a
+                    `relationships` or `links` member, as those members are reserved by this specification for future use.
+
+                    Although has-one foreign keys (e.g. author_id) are often stored internally alongside other
+                    information to be represented in a resource object, these keys SHOULD NOT appear as attributes.
+
+            Error:
+                base: Base
+                defaults:
+                    attributes:
+                        nullable: false
+                description: |
+                    A server MAY choose to stop processing as soon as a problem is encountered, or
+                    it MAY continue processing and encounter multiple problems.
+                    For instance, a server might process multiple attributes and then return
+                    multiple validation problems in a single response.
+
+                    When a server encounters multiple problems for a single request, the most
+                    generally applicable HTTP error code SHOULD be used in the response.
+                    For instance, 400 Bad Request might be appropriate for multiple 4xx errors
+                    or 500 Internal Server Error might be appropriate for multiple 5xx errors.
+                attributes:
+                    code: An application-specific error code, expressed as a string value.
+                    detail: |
+                        A human-readable explanation specific to this occurrence of the problem.
+                        Like `title`, this field's value can be localized.
+                    id: Unique identifier for this particular occurrence of the problem.
+                    links: A links object containing error references ({ErrorLink}).
+                    meta: A meta object containing non-standard meta-information about the error ({object})
+                    source: An object containing references to the source of the error ({ErrorSource}).
+                    status: The HTTP status code applicable to this problem, expressed as a string value.
+                    title: |
+                        A short, human-readable summary of the problem that SHOULD NOT change from
+                        occurrence to occurrence of the problem, except for purposes of localization.
+                methods:
+                    toJSON:
+                        override: true
+                        body: |
+                            this.keepKeys('links', ['about']);
+                            this.keepKeys('source', ['parameter', 'pointer']);
+
+                            return super.toJSON();
+
+            ErrorLink:
+                base: Base
+                description: A links object containing error references.
+                attributes:
+                    about: A link that leads to further details about this particular occurrence of the problem.
+            Errors:
+                base: CollectionBase
+                description: List of errors found.
+                includes:
+                    Error:
+                attributes:
+                    ITEM:
+                        const: true
+                        override: true
+                        nullable: false
+                        static: true
+                        rawvalue: jfJsonApiError
+            ErrorSource:
+                base: Base
+                description: An object containing references to the source of the error.
+                attributes:
+                    parameter: A string indicating which URI query parameter caused the error.
+                    pointer: |
+                        A JSON Pointer (RFC6901) to the associated entity in the request
+                        document [e.g. "/data" for a primary data object, or
+                        "/data/attributes/title" for a specific attribute].
+
+            JsonApi:
+                base: Base
+                description: |
+                    A JSON API document MAY include information about its implementation
+                    under a top level `jsonapi` member.
+                attributes:
+                    meta: This value is a meta object that contains non-standard meta-information ({Meta,nullable=false}).
+                    version:  This value is a string indicating the highest JSON API version supported ({value='1.0',nullable=false}).
+            Link:
+                base: Base
+                defaults:
+                    attributes:
+                        nullable: false
+                description: |
+                    Each member of a links object is a `link`. A link MUST be represented as either:
+
+                    - A string containing the link's URL.
+                    - An object (`link object`) which can contain the following members:
+                      - href: A string containing the link's URL.
+                      - meta: A meta object containing non-standard meta-information about the link.
+                attributes:
+                    href: String containing the link's URL.
+                    meta: Meta object containing non-standard meta-information about the link ({Meta}).
+                methods:
+                    toJSON:
+                        override: true
+                        body: |
+                            let _data;
+                            const _hasHref = this.hasValue(this.href);
+                            if (_hasHref)
+                            {
+                                _data = this.hasValue(this.meta)
+                                    ? super.toJSON()
+                                    : this.href;
+                            }
+
+                            return _data;
+
+            Links:
+                base: Base
+                defaults:
+                    attributes:
+                        nullable: false
+                description: |
+                    Where specified, a links member can be used to represent links.
+
+                    The value of each `links` member MUST be an object (a `link object`).
+
+                    A links object containing at least one of the following:
+
+                    - related: A related resource link.
+                    - self:    A link for the relationship itself (a `relationship link`).
+                               This link allows the client to directly manipulate the relationship.
+                               For example, removing an author through an article's relationship URL would disconnect
+                               the person from the article without deleting the people resource itself.
+                               When fetched successfully, this link returns the linkage for the related resources as
+                               its primary data.
+                attributes:
+                    first: The first page of data (only in pagination links of a collection).
+                    last: The last page of data (only in pagination links of a collection).
+                    next: The next page of data (only in pagination links of a collection).
+                    prev: The previous page of data (only in pagination links of a collection).
+                    related: |
+                        Provides access to resource objects linked in a relationship.
+                        When fetched, the related resource object(s) are returned as
+                        the response's primary data.
+                    self: Identifies the resource represented by the resource object.
+                methods:
+                    setProperties:
+                        override: true
+                        params:
+                            values:
+                                tags: false
+                        body: |
+                            const _isObject = this.constructor.isObject;
+                            if (_isObject(values))
+                            {
+                                const _values = {};
+                                Object.keys(values).forEach(
+                                    key =>
+                                    {
+                                        const _value = values[key];
+                                        _values[key] = _isObject(_value)
+                                            ? jfJsonApiBase.create('Link', _value)
+                                            : _value;
+                                    }
+                                );
+                                super.setProperties(_values);
+                            }
+
+            Meta:
+                base: Base
+                description: |
+                    Where specified, a meta member can be used to include non-standard meta-information.
+
+                    The value of each meta member MUST be an object (a `meta object`).
+
+                    Any members MAY be specified within meta objects.
+                attributes:
+                    allowEmptyValues:
+                        const: true
+                        override: true
+                        tags: false
+                        value: true
+                methods:
+                    setProperties:
+                        override: true
+                        params:
+                            values:
+                                tags: false
+                        body: |
+                            if (this.constructor.isObject(values))
+                            {
+                                Object.assign(this, values);
+                            }
+
+            Relationship:
+                base: Base
+                defaults:
+                    attributes:
+                        nullable: false
+                description: |
+                    Represent references from the resource object in which it's defined to other resource objects.
+                attributes:
+                    data: |
+                        Allows a client to link together all of the included resource
+                        objects without having to GET any URLs via links ({ResourceIdentifier})
+                    links: A links object containing with information about relationship ({Links}).
+                    meta: Meta object containing non-standard meta-information about the relationship ({Meta})
+                methods:
+                    toJSON:
+                        override: true
+                        body: |
+                            const _data  = super.toJSON();
+                            const _links = _data.links;
+                            // A links object containing at least one of the following: self, related
+                            if (_links && !_links.self && !_links.related)
+                            {
+                                _data.links = null;
+                            }
+
+                            return this.hasValue(_data.meta) || this.hasValue(_data.data) || this.hasValue(_data.links)
+                                ? _data
+                                : undefined;
+
+            Relationships:
+                base: Base
+                description: |
+                    The value of the relationships key MUST be an object (a `relationships object`).
+
+                    Members of the relationships object (`relationships`) represent references from
+                    the resource object in which it’s defined to other resource objects.
+
+                    Relationships may be to-one or to-many.
+                methods:
+                    setProperties:
+                        override: true
+                        params:
+                            values:
+                                tags: false
+                        body: |
+                            const _isObject = this.constructor.isObject;
+                            if (_isObject(values))
+                            {
+                                Object.keys(values)
+                                    .filter(key  => _isObject(values[key]))
+                                    .forEach(key => this[key] = jfJsonApiBase.create('Relationship', values[key]));
+                            }
+            Resource:
+                base: ResourceIdentifier
+                defaults:
+                    attributes:
+                        nullable: false
+                description: |
+                    The document's `primary data` is a representation of the resource or collection of resources
+                    targeted by a request.
+
+                    Every resource object MUST contain an id member and a type member. The values of the id and type
+                    members MUST be strings.
+
+                    Within a given API, each resource object's type and id pair MUST identify a single, unique resource.
+                    The set of URIs controlled by a server, or multiple servers acting as one, constitute an API.
+
+                    The type member is used to describe resource objects that share common attributes and relationships.
+
+                    The values of type members MUST adhere to the same constraints as member names.
+                attributes:
+                    attributes: An attributes object representing some of the resource's data ({Attributes}).
+                    links: Links of resource ({Links}).
+                    relationships:
+                        description: |
+                            A relationships object describing relationships between
+                            the resource and other JSON API resources.
+                        type: Relationships
+                methods:
+                    __checkAttributes:
+                        description: |
+                            Check if `item` is an instance of `jf.dataType.Item` looking for properties `ID`
+                            and `TYPE` instead of add this module as dependency.
+
+                            If not is a `jf.dataType.Item`, then check if item has `__ID` and `__TYPE` properties.
+                        params:
+                            item: Item to check ({object})
+                        return: Plain attribute object ({object})
+                        body: |
+                            let _attributes;
+                            const _result = {};
+                            let _id       = item.constructor.ID;
+                            let _type     = item.constructor.TYPE;
+                            if (_id && _type)
+                            {
+                                _result.type       = _type;
+                                _result.id         = item[_id];
+                                _result.attributes = item.toJSON();
+                            }
+                            else
+                            {
+                                // If not, check for properties __ID and __TYPE.
+                                _id   = item.__ID;
+                                _type = item.__TYPE;
+                                if (_id && _type)
+                                {
+                                    // Copy object for deleting properties in copy.
+                                    _attributes = { ...item };
+                                    delete _attributes.__ID;
+                                    delete _attributes.__TYPE;
+                                    _result.type       = _type;
+                                    _result.id         = item[_id];
+                                    _result.attributes = _attributes;
                                 }
                                 else
                                 {
-                                    _hasValue = Object.keys(value).length > 0;
+                                    Object.assign(_result, item);
                                 }
-                                break;
-                        }
-                    }
+                            }
 
-                    return _hasValue;
-            toJSON:
-                override: true
-                body: |
-                    const _data = super.toJSON();
-                    if (!this.constructor.allowEmptyValues)
-                    {
-                        Object.keys(_data)
-                            .filter(key => !this.hasValue(_data[key]))
-                            .forEach(key => delete _data[key]);
-                    }
+                            return _result;
+                    setProperties:
+                        override: true
+                        tags: false
+                        params:
+                            values:
+                                tags: false
+                        body: |
+                            const _isObject = this.constructor.isObject;
+                            if (_isObject(values))
+                            {
+                                if (_isObject(values.attributes))
+                                {
+                                    if (!values.id || !values.type)
+                                    {
+                                        const _tmp = this.__checkAttributes(values.attributes);
+                                        if (_tmp.type)
+                                        {
+                                            values = Object.assign(_tmp, values);
+                                        }
+                                        else
+                                        {
+                                            delete values.attributes;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    values = this.__checkAttributes(values);
+                                }
+                            }
+                            super.setProperties(values);
 
-                    return _data;
+            Resources:
+                base: CollectionBase
+                description: Collection of `Resource` items.
+                includes:
+                    Resource:
+                attributes:
+                    ITEM:
+                        const: true
+                        override: true
+                        nullable: false
+                        static: true
+                        rawvalue: jfJsonApiResource
+            ResourceIdentifier:
+                base: Base
+                defaults:
+                    attributes:
+                        nullable: false
+                description: A `resource identifier object` is an object that identifies an individual resource.
+                attributes:
+                    id:
+                        description: |
+                            Resource identifier.
 
-    Attributes:
-        basename: Meta
-        description: |
-            The value of the attributes key MUST be an object (an `attributes object`).
-            Members of the attributes object (`attributes`) represent information about the resource object in which it's defined.
+                            The id member is not required when the resource object originates
+                            at the client and represents a new resource to be created on the server
+                        type: integer|string
+                        validators:
+                            required: true
+                    meta:
+                        description: |
+                            A meta object containing non-standard meta-information about
+                            a resource that can not be represented as an attribute or relationship.
 
-            Attributes may contain any valid JSON value.
-
-            Complex data structures involving JSON objects and arrays are allowed as attribute values.
-            However, any object that constitutes or is contained in an attribute MUST NOT contain a
-            `relationships` or `links` member, as those members are reserved by this specification for future use.
-
-            Although has-one foreign keys (e.g. author_id) are often stored internally alongside other
-            information to be represented in a resource object, these keys SHOULD NOT appear as attributes.
-
-    Error:
-        description: |
-            A server MAY choose to stop processing as soon as a problem is encountered, or
-            it MAY continue processing and encounter multiple problems.
-            For instance, a server might process multiple attributes and then return
-            multiple validation problems in a single response.
-
-            When a server encounters multiple problems for a single request, the most
-            generally applicable HTTP error code SHOULD be used in the response.
-            For instance, 400 Bad Request might be appropriate for multiple 4xx errors
-            or 500 Internal Server Error might be appropriate for multiple 5xx errors.
-        properties:
-            code: An application-specific error code, expressed as a string value.
-            detail: |
-                A human-readable explanation specific to this occurrence of the problem.
-                Like `title`, this field's value can be localized.
-            id: Unique identifier for this particular occurrence of the problem.
-            links: A links object containing error references (ErrorLink).
-            meta: A meta object containing non-standard meta-information about the error (*)
-            title: |
-                A short, human-readable summary of the problem that SHOULD NOT change from
-                occurrence to occurrence of the problem, except for purposes of localization.
-            source: An object containing references to the source of the error (ErrorSource).
-            status: The HTTP status code applicable to this problem, expressed as a string value.
-
-    ErrorLink:
-        description: A links object containing error references.
-        properties:
-            about: A link that leads to further details about this particular occurrence of the problem.
-
-    ErrorSource:
-        description: An object containing references to the source of the error.
-        properties:
-            parameter: A string indicating which URI query parameter caused the error.
-            pointer: |
-                A JSON Pointer (RFC6901) to the associated entity in the request
-                document [e.g. "/data" for a primary data object, or
-                "/data/attributes/title" for a specific attribute].
-
-    JsonApi:
-        description: |
-            A JSON API document MAY include information about its implementation
-            under a top level `jsonapi` member.
-        properties:
-            meta: This value is a meta object that contains non-standard meta-information (Meta).
-            version:  This value is a string indicating the highest JSON API version supported (value:1.0).
-
-    Link:
-        description: |
-            Each member of a links object is a `link`. A link MUST be represented as either:
-
-            - A string containing the link's URL.
-            - An object (`link object`) which can contain the following members:
-              - href: A string containing the link's URL.
-              - meta: A meta object containing non-standard meta-information about the link.
-        properties:
-            href: String containing the link's URL.
-            meta: Meta object containing non-standard meta-information about the link (Meta).
-
-    Links:
-        description: |
-            Where specified, a links member can be used to represent links.
-            The value of each `links` member MUST be an object (a `link object`).
-
-            A links object containing at least one of the following:
-            - self:    A link for the relationship itself (a `relationship link`).
-                       This link allows the client to directly manipulate the relationship.
-                       For example, removing an author through an article's relationship
-                       URL would disconnect the person from the article without deleting
-                       the people resource itself.
-                       When fetched successfully, this link returns the linkage for the
-                       related resources as its primary data.
-            - related: A related resource link.
-        properties:
-            first: The first page of data.
-            last: The last page of data.
-            next: The next page of data.
-            prev: The previous page of data.
-            related: |
-                Provides access to resource objects linked in a relationship.
-                When fetched, the related resource object(s) are returned as
-                the response's primary data.
-            self: Identifies the resource represented by the resource object.
-
-    Meta:
-        description: |
-            Where specified, a meta member can be used to include non-standard meta-information.
-
-            The value of each meta member MUST be an object (a `meta object`).
-
-            Any members MAY be specified within meta objects.
-
-    Relationship:
-        description: |
-            Represent references from the resource object in which it's defined to
-            other resource objects.
-        properties:
-            data:
+                            A `resource identifier object` MAY also include a meta member, whose
+                            value is a meta object that contains non-standard meta-information.
+                        type: Meta
+                    type: The type member is used to describe resource objects that share common attributes and relationships.
+            Root:
+                base: Base
+                includes:
+                    Resource:
+                defaults:
+                    attributes:
+                        nullable: false
                 description: |
-                    Allows a client to link together all of the included
-                    resource objects without having to GET any URLs via links.
-                type: ResourceIdentifier
-            links: A links object containing with information about relationship (Links).
-            meta: Meta object containing non-standard meta-information about the relationship (Meta)
+                    A JSON object MUST be at the root of every JSON API request and response containing data.
 
-    Resource:
-        basename: ResourceIdentifier
-        description: |
-            The document's `primary data` is a representation of the resource
-            or collection of resources targeted by a request.
+                    This object defines a document's `top level`.
+                attributes:
+                    CONTENT_TYPE: Returns `Content-Type` header to use with JSON API ({const=true,static=true,value=application/vnd.api+json})
+                    data: The document's primary data ({Resource})
+                    errors: Array of error objects ({Errors})
+                    included: An array of resource objects that are related to the primary data and/or each other ({Resources})
+                    jsonapi: An object describing the server's implementation ({JsonApi})
+                    links: An object describing the server's implementation ({Links})
+                    meta: The document's metadata ({Meta})
+                methods:
+                    addData:
+                        description: Add an item to response data.
+                        params:
+                            data: Item to add to data section ({object})
+                        body: |
+                            let _current = this.data;
+                            if (_current instanceof jfJsonApiResource)
+                            {
+                                _current.add(data);
+                            }
+                            else
+                            {
+                                this.setProperties({ data });
+                            }
+                    _parseData:
+                        description: Add data to include section.
+                        params:
+                            item: Item to add to include section ({object})
+                        tags:
+                            - name: '@NOTE'
+                              value: Called from `jf.Object`.
+                        body: |
+                            if (Array.isArray(item))
+                            {
+                                if (this.data instanceof jfJsonApiResource)
+                                {
+                                    this.data.setProperties(item);
+                                }
+                                else
+                                {
+                                    this.data = jfJsonApiBase.create('Resource', item);
+                                }
+                            }
+                            else
+                            {
+                                this.data = jfJsonApiBase.create('Resource', item);
+                            }
+                    _parseIncluded:
+                        description: Parse items and add them to include section.
+                        params:
+                            items: Items to add to include section ({'array|object'})
+                        tags:
+                            - name: '@NOTE'
+                              value: Called from `jf.Object`.
+                        body: |
+                            if (Array.isArray(items))
+                            {
+                                this.included.setProperties(items);
+                            }
+                            else
+                            {
+                                this.included.add(items);
+                            }
+                    toApp:
+                        description: Return instance value as needed in user application.
+                        return: Value of instance ({object})
+                        body: |
+                            const _app     = {
+                                data   : this.included.groupBy('type'),
+                                errors : this.errors.groupBy('code')
+                            };
+                            const _appData = _app.data;
+                            const _data    = this.data;
+                            if (_data instanceof jfJsonApiResource)
+                            {
+                                const _type = _data.type;
+                                if (_type in _appData)
+                                {
+                                    _appData[_type].push(_data);
+                                }
+                                else
+                                {
+                                    _appData[_type] = [_data];
+                                }
+                            }
+                            else if (_data instanceof jfJsonApiResources)
+                            {
+                                Object.assign(_appData, _data.groupBy('type'));
+                            }
+                            Object.keys(_appData)
+                                .forEach(type => _appData[type] = _appData[type].map(item => item.toJSON().attributes));
 
-            Every resource object MUST contain an id member and a type member.
-            The values of the id and type members MUST be strings.
+                            return _app;
+                    toJSON:
+                        override: true
+                        body: |
+                            const _data = super.toJSON();
+                            if (_data.errors)
+                            {
+                                // The members data and errors MUST NOT coexist in the same document.
+                                delete _data.data;
+                                delete _data.included;
+                            }
+                            else if (!_data.data)
+                            {
+                                // If current data is an empty collection, set an empty array.
+                                if (Array.isArray(this.data))
+                                {
+                                    _data.data = [];
+                                }
+                                else
+                                {
+                                    if (_data.included)
+                                    {
+                                        // If a document does not contain a top-level `data` key,
+                                        // the `included` member MUST NOT be present either.
+                                        delete _data.included;
+                                    }
+                                    if (!_data.meta)
+                                    {
+                                        _data.data = null;
+                                    }
+                                }
+                            }
 
-            Within a given API, each resource object's type and id pair MUST
-            identify a single, unique resource. (The set of URIs controlled by a
-            server, or multiple servers acting as one, constitute an API.)
-
-            The type member is used to describe resource objects that share
-            common attributes and relationships.
-
-            The values of type members MUST adhere to the same constraints as member names.
-        properties:
-            attributes: An attributes object representing some of the resource's data (Attributes).
-            links: Links of resource (Links).
-            relationships:
-                description: |
-                    A relationships object describing relationships between
-                    the resource and other JSON API resources.
-                type: Relationships
-
-    ResourceIdentifier:
-        description: A `resource identifier object` is an object that identifies an individual resource.
-        properties:
-            id: |
-                Resource identifier.
-
-                The id member is not required when the resource object originates
-                at the client and represents a new resource to be created on the server. (required:true)
-            meta:
-                description: |
-                    A meta object containing non-standard meta-information about
-                    a resource that can not be represented as an attribute or relationship.
-
-                    A `resource identifier object` MAY also include a meta member, whose
-                    value is a meta object that contains non-standard meta-information.
-                type: Meta
-            type: The type member is used to describe resource objects that share common attributes and relationships.
-
-    Root:
-        description: |
-            A JSON object MUST be at the root of every JSON API request and
-            response containing data.
-
-            This object defines a document's `top level`.
-        const:
-            CONTENT_TYPE:
-                description: Returns `Content-Type` header to use with JSON API
-                value: application/vnd.api+json
-        properties:
-            data: The document's primary data (Resource)
-            errors: Array of error objects (Errors)
-            included: An array of resource objects that are related to the primary data and/or each other (Resources)
-            links: An object describing the server's implementation (Links)
-            jsonapi: An object describing the server's implementation (JsonApi)
-            meta: The document's metadata (Meta)
+                            return _data;
+                    toServer:
+                        description: Return instance value as needed in server application.
+                        return: Value of instance ({object})
+                        body: |
+                            return {
+                                data : this.toJSON().data
+                            };

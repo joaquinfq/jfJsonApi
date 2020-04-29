@@ -1,6 +1,10 @@
-const jfJsonApiAttributes         = require('./Attributes');
-const jfJsonApiLinks              = require('./Links');
-const jfJsonApiRelationships      = require('./Relationships');
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./Attributes');
+require('./Links');
+require('./Relationships');
+//-----------------------------------------------------------------------------
 const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
 
 /**
@@ -24,6 +28,14 @@ const jfJsonApiResourceIdentifier = require('./ResourceIdentifier');
 class jfJsonApiResource extends jfJsonApiResourceIdentifier
 {
     /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Resource';
+    }
+    
+    /**
      * @override
      */
     constructor(config)
@@ -35,14 +47,14 @@ class jfJsonApiResource extends jfJsonApiResourceIdentifier
          * @property attributes
          * @type     {jf.JsonApi.Attributes}
          */
-        this.attributes = new jfJsonApiAttributes();
+        this.attributes = jfJsonApiResourceIdentifier.create('Attributes');
         /**
          * Links of resource.
          *
          * @property links
          * @type     {jf.JsonApi.Links}
          */
-        this.links = new jfJsonApiLinks();
+        this.links = jfJsonApiResourceIdentifier.create('Links');
         /**
          * A relationships object describing relationships between
          * the resource and other JSON API resources.
@@ -50,7 +62,7 @@ class jfJsonApiResource extends jfJsonApiResourceIdentifier
          * @property relationships
          * @type     {jf.JsonApi.Relationships}
          */
-        this.relationships = new jfJsonApiRelationships();
+        this.relationships = jfJsonApiResourceIdentifier.create('Relationships');
         //---------------------------------------------------------------------
         this.setProperties(config);
     }
@@ -135,4 +147,9 @@ class jfJsonApiResource extends jfJsonApiResourceIdentifier
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiResourceIdentifier.register(jfJsonApiResource.NAME, jfJsonApiResource);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiResource;

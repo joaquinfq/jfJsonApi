@@ -1,5 +1,9 @@
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./Meta');
+//-----------------------------------------------------------------------------
 const jfJsonApiBase = require('./Base');
-const jfJsonApiMeta = require('./Meta');
 
 /**
  * A JSON API document MAY include information about its implementation
@@ -12,6 +16,14 @@ const jfJsonApiMeta = require('./Meta');
 class jfJsonApiJsonApi extends jfJsonApiBase
 {
     /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'JsonApi';
+    }
+    
+    /**
      * @override
      */
     constructor(config)
@@ -23,7 +35,7 @@ class jfJsonApiJsonApi extends jfJsonApiBase
          * @property meta
          * @type     {jf.JsonApi.Meta}
          */
-        this.meta = new jfJsonApiMeta();
+        this.meta = jfJsonApiBase.create('Meta');
         /**
          * This value is a string indicating the highest JSON API version supported.
          *
@@ -36,4 +48,9 @@ class jfJsonApiJsonApi extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiJsonApi.NAME, jfJsonApiJsonApi);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiJsonApi;

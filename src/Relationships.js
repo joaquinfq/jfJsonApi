@@ -1,5 +1,4 @@
-const jfJsonApiBase         = require('./Base');
-const jfJsonApiRelationship = require('./Relationship');
+const jfJsonApiBase = require('./Base');
 
 /**
  * The value of the relationships key MUST be an object (a `relationships object`).
@@ -16,6 +15,14 @@ const jfJsonApiRelationship = require('./Relationship');
 class jfJsonApiRelationships extends jfJsonApiBase
 {
     /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Relationships';
+    }
+    
+    /**
      * @override
      */
     setProperties(values)
@@ -25,9 +32,14 @@ class jfJsonApiRelationships extends jfJsonApiBase
         {
             Object.keys(values)
                 .filter(key  => _isObject(values[key]))
-                .forEach(key => this[key] = new jfJsonApiRelationship(values[key]));
+                .forEach(key => this[key] = jfJsonApiBase.create('Relationship', values[key]));
         }
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiRelationships.NAME, jfJsonApiRelationships);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiRelationships;

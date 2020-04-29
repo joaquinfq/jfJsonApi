@@ -1,5 +1,4 @@
 const jfJsonApiBase = require('./Base');
-const jfJsonApiLink = require('./Link');
 
 /**
  * Where specified, a links member can be used to represent links.
@@ -22,6 +21,14 @@ const jfJsonApiLink = require('./Link');
  */
 class jfJsonApiLinks extends jfJsonApiBase
 {
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'Links';
+    }
+    
     /**
      * @override
      */
@@ -90,7 +97,7 @@ class jfJsonApiLinks extends jfJsonApiBase
                 {
                     const _value = values[key];
                     _values[key] = _isObject(_value)
-                        ? new jfJsonApiLink(_value)
+                        ? jfJsonApiBase.create('Link', _value)
                         : _value;
                 }
             );
@@ -99,4 +106,9 @@ class jfJsonApiLinks extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiLinks.NAME, jfJsonApiLinks);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiLinks;

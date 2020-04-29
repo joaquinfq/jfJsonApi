@@ -1,5 +1,9 @@
+//-----------------------------------------------------------------------------
+// Require classes to register them in factory
+//-----------------------------------------------------------------------------
+require('./Meta');
+//-----------------------------------------------------------------------------
 const jfJsonApiBase = require('./Base');
-const jfJsonApiMeta = require('./Meta');
 
 /**
  * A `resource identifier object` is an object that identifies an individual resource.
@@ -10,6 +14,14 @@ const jfJsonApiMeta = require('./Meta');
  */
 class jfJsonApiResourceIdentifier extends jfJsonApiBase
 {
+    /**
+     * Name used to register class in factory.
+     */
+    static get NAME()
+    {
+        return 'ResourceIdentifier';
+    }
+    
     /**
      * @override
      */
@@ -36,7 +48,7 @@ class jfJsonApiResourceIdentifier extends jfJsonApiBase
          * @property meta
          * @type     {jf.JsonApi.Meta}
          */
-        this.meta = new jfJsonApiMeta();
+        this.meta = jfJsonApiBase.create('Meta');
         /**
          * The type member is used to describe resource objects that share common attributes and relationships.
          *
@@ -49,4 +61,9 @@ class jfJsonApiResourceIdentifier extends jfJsonApiBase
     }
 }
 
+//-----------------------------------------------------------------------------
+// Register class in factory to retrieve it in other classes.
+//-----------------------------------------------------------------------------
+jfJsonApiBase.register(jfJsonApiResourceIdentifier.NAME, jfJsonApiResourceIdentifier);
+//-----------------------------------------------------------------------------
 module.exports = jfJsonApiResourceIdentifier;
